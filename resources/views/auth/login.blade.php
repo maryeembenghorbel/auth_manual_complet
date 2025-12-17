@@ -1,115 +1,144 @@
 @extends('layouts.app')
 
+@section('page-title', 'Connexion')
+@section('page-subtitle', 'Accédez à la plateforme SIAM')
+
 @section('content')
-<div class="auth-container">
-
-    <div class="card auth-card">
-        <h2 class="title">
-            <i class="fa-solid fa-right-to-bracket"></i> Connexion
-        </h2>
-
-        <form action="{{ route('login') }}" method="POST">
-            @csrf
-
-            <!-- Email -->
-            <div class="form-group mb-3">
-                <label class="label">
-                    <i class="fa-solid fa-envelope"></i> Email
-                </label>
-                <input type="email" name="email" class="form-control input-custom" required>
-                @error('email')
-                    <span class="text-danger small">{{ $message }}</span>
-                @enderror
+<div class="row justify-content-center align-items-center" style="min-height: calc(100vh - 100px);">
+    <div class="col-md-6 col-lg-4">
+        <div class="content-card auth-card border-0">
+            <div class="card-header text-center">
+                <h5 class="mb-0 fw-bold text-white">
+                    <i class="fa-solid fa-right-to-bracket me-2"></i>Connexion
+                </h5>
             </div>
 
-            <!-- Password -->
-            <div class="form-group mb-3">
-                <label class="label">
-                    <i class="fa-solid fa-lock"></i> Mot de passe
-                </label>
-                <input type="password" name="password" class="form-control input-custom" required>
+            <div class="card-body p-4">
+                {{-- Message d’erreur global --}}
+                @if ($errors->has('email'))
+                    <div class="alert alert-danger border-0 shadow-sm mb-3">
+                        <i class="fa-solid fa-triangle-exclamation me-2"></i>
+                        Identifiants invalides, veuillez réessayer.
+                    </div>
+                @endif
+
+                <form action="{{ route('login') }}" method="POST" class="needs-validation" novalidate>
+                    @csrf
+
+                    {{-- Email --}}
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold text-dark">
+                            <i class="fa-solid fa-envelope me-1"></i> Email
+                        </label>
+                        <input type="email"
+                               name="email"
+                               class="form-control form-control-lg @error('email') is-invalid @enderror"
+                               value="{{ old('email') }}"
+                               required
+                               autofocus>
+                        @error('email')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    {{-- Mot de passe --}}
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold text-dark">
+                            <i class="fa-solid fa-lock me-1"></i> Mot de passe
+                        </label>
+                        <input type="password"
+                               name="password"
+                               class="form-control form-control-lg @error('password') is-invalid @enderror"
+                               required>
+                        @error('password')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    {{-- Se souvenir de moi --}}
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="remember" id="remember">
+                            <label class="form-check-label small" for="remember">
+                                Se souvenir de moi
+                            </label>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-login mb-3">
+                        <i class="fa-solid fa-arrow-right-to-bracket me-2"></i>Se connecter
+                    </button>
+
+                    <div class="auth-links">
+                        <span class="text-muted small">Pas de compte ?</span>
+                        <a href="{{ route('register') }}">Créer un compte</a>
+                    </div>
+                </form>
             </div>
-
-            <button type="submit" class="btn btn-login">
-                <i class="fa-solid fa-arrow-right-to-bracket"></i> Se connecter
-            </button>
-
-        </form>
+        </div>
     </div>
-
 </div>
-<style >
-    /* ============================= */
-/* LABELS ET INPUTS LOGIN */
-/* ============================= */
-.auth-card label {
-    font-weight: 600;
-    color: var(--blue-navy);
-    display: block;
-    margin-bottom: 5px;
-}
 
-.auth-card input {
-    width: 100%;
-    padding: 12px 15px;
-    margin-bottom: 20px;
-    border: 1px solid #d0d4dd;
-    border-radius: 8px;
-    background: var(--input-bg);
-    font-size: 15px;
-    transition: 0.25s;
-}
+@push('styles')
+<style>
+    .auth-card {
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 15px 40px rgba(0,0,0,0.12);
+        animation: fadeIn 0.5s ease-out;
+    }
+    .auth-card .card-header {
+        background: linear-gradient(135deg, var(--primary-navy), var(--secondary-burgundy));
+        border-bottom: none;
+    }
+    .btn-login {
+        background: linear-gradient(135deg, var(--primary-navy), var(--secondary-burgundy));
+        width: 100%;
+        padding: 12px;
+        font-size: 17px;
+        border-radius: 10px;
+        border: none;
+        color: #fff;
+        cursor: pointer;
+        transition: 0.25s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .btn-login:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 8px 25px rgba(10,26,68,0.4);
+    }
+    .auth-links a {
+        color: var(--primary-navy);
+        font-weight: 600;
+        text-decoration: none;
+    }
+    .auth-links a:hover {
+        color: var(--secondary-burgundy);
+        text-decoration: underline;
+    }
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(15px); }
+        to   { opacity: 1; transform: translateY(0); }
+    }
+</style>
+@endpush
 
-.auth-card input:focus {
-    border-color: var(--blue-navy);
-    box-shadow: 0 0 5px rgba(10,26,68,0.3);
-    outline: none;
-}
-
-/* ============================= */
-/* BOUTON LOGIN */
-/* ============================= */
-.btn-login {
-    background: var(--burgundy);
-    width: 100%;
-    padding: 12px;
-    font-size: 17px;
-    border-radius: 8px;
-    border: none;
-    color: white;
-    cursor: pointer;
-    transition: 0.25s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.btn-login:hover {
-    background: #58081f;
-}
-
-.btn-login i {
-    margin-right: 8px;
-}
-
-/* ============================= */
-/* LIENS CONNEXION / INSCRIPTION */
-/* ============================= */
-.auth-links {
-    text-align: center;
-    margin-bottom: 20px;
-}
-
-.auth-links a {
-    color: var(--blue-navy);
-    text-decoration: none;
-    font-weight: 500;
-    margin: 0 10px;
-    transition: 0.25s;
-}
-
-.auth-links a:hover {
-    color: var(--burgundy);
-}
-</style >
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const forms = document.querySelectorAll('.needs-validation');
+    Array.prototype.slice.call(forms).forEach(function (form) {
+        form.addEventListener('submit', function (event) {
+            if (!form.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            form.classList.add('was-validated');
+        }, false);
+    });
+});
+</script>
+@endpush
 @endsection
