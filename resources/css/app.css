@@ -1,0 +1,150 @@
+/* ============================= */
+/* VARIABLES DE COULEURS */
+/* ============================= */
+:root {
+    --blue-navy: #0A1A44;
+    --burgundy: #7A0A2A;
+    --light-bg: #f4f6fa;
+    --input-bg: #f0f2f5;
+}
+
+/* ============================= */
+/* BODY ET CONTENEUR PRINCIPAL */
+/* ============================= */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: var(--light-bg);
+    margin: 0;
+    padding: 0;
+}
+
+.auth-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+/* ============================= */
+/* CARD DU FORMULAIRE */
+/* ============================= */
+.auth-card {
+    background: white;
+    padding: 40px 35px;
+    max-width: 420px;
+    width: 100%;
+    border-radius: 15px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    border-top: 6px solid var(--burgundy);
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+/* ============================= */
+/* TITRES ET ICONES */
+/* ============================= */
+.auth-card .title {
+    text-align: center;
+    font-size: 26px;
+    font-weight: bold;
+    color: var(--blue-navy);
+    margin-bottom: 25px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.auth-card .title i {
+    margin-right: 10px;
+}
+
+/* ============================= */
+/* LABELS ET INPUTS */
+/* ============================= */
+.auth-card label {
+    font-weight: 600;
+    color: var(--blue-navy);
+    display: block;
+    margin-bottom: 5px;
+}
+
+.auth-card input {
+    width: 100%;
+    padding: 12px 15px;
+    margin-bottom: 20px;
+    border: 1px solid #d0d4dd;
+    border-radius: 8px;
+    background: var(--input-bg);
+    font-size: 15px;
+    transition: 0.25s;
+}
+
+.auth-card input:focus {
+    border-color: var(--blue-navy);
+    box-shadow: 0 0 5px rgba(10,26,68,0.3);
+    outline: none;
+}
+
+/* ============================= */
+/* BOUTONS LOGIN / REGISTER */
+/* ============================= */
+.auth-card .btn {
+    width: 100%;
+    padding: 12px;
+    font-size: 17px;
+    border-radius: 8px;
+    border: none;
+    color: white;
+    cursor: pointer;
+    transition: 0.25s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-login {
+    background: var(--burgundy);
+}
+
+.btn-login:hover {
+    background: #58081f;
+}
+
+.btn-register {
+    background: var(--burgundy);
+}
+
+.btn-register:hover {
+    background: #58081f;
+}
+
+.btn i {
+    margin-right: 8px;
+}
+
+/* ============================= */
+/* ANIMATION FADE IN */
+/* ============================= */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(15px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* ============================= */
+/* LIENS CONNEXION / INSCRIPTION */
+/* ============================= */
+.auth-links {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.auth-links a {
+    color: var(--blue-navy);
+    text-decoration: none;
+    font-weight: 500;
+    margin: 0 10px;
+    transition: 0.25s;
+}
+
+.auth-links a:hover {
+    color: var(--burgundy);
+}
