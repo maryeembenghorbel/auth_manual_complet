@@ -5,13 +5,16 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
-
+use App\Models\Role;
 class AuthController extends Controller
 {
     // --- INSCRIPTION ---
     public function showRegister() {
-        return view('auth.register');
+         $roles = Role::where('name', '!=', 'Admin')->get();
+          return view('auth.register', compact('roles'));
+
     }
+ 
 
     public function register(Request $request) {
       $request->validate([
@@ -31,7 +34,9 @@ class AuthController extends Controller
 ]);
 
 
-        return redirect()->route('login')->with('success', 'Compte créé !');
+          return redirect()
+            ->route('login')
+            ->with('success', 'Compte créé avec succès, vous pouvez maintenant vous connecter.');
     }
 
     // --- CONNEXION ---

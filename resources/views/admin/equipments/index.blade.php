@@ -77,9 +77,7 @@
             <div class="card-header d-flex justify-content-between align-items-center">
                 <h5 class="mb-0 fw-bold text-white">
                     <i class="fas fa-list me-2"></i>Liste des équipements
-                    <span class="badge bg-light text-dark ms-2">
-                        {{ $equipments->total() }} éléments
-                    </span>
+                    
                 </h5>
             </div>
             <div class="card-body p-0">
@@ -149,7 +147,7 @@
                                 </td>
                                 <td>
                                     @if($equipment->price)
-                                        {{ number_format($equipment->price, 2, ',', ' ') }} MAD
+                                        {{ number_format($equipment->price, 2, ',', ' ') }} TND
                                     @else
                                         <span class="text-muted">–</span>
                                     @endif
@@ -200,5 +198,31 @@
     </div>
 </div>
 
+@include('admin.equipments._delete-modal')
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const deleteButtons = document.querySelectorAll('.btn-delete-equipment');
+    const deleteModal   = new bootstrap.Modal(document.getElementById('deleteEquipmentModal'));
+    const nameSpan      = document.getElementById('deleteEquipmentName');
+    const confirmBtn    = document.getElementById('confirmDeleteEquipmentBtn');
+    let currentForm     = null;
+
+    deleteButtons.forEach(btn => {
+        btn.addEventListener('click', function () {
+            const name = this.dataset.equipmentName;
+            currentForm = this.closest('form');
+            nameSpan.textContent = name;
+            deleteModal.show();
+        });
+    });
+
+    confirmBtn.addEventListener('click', function () {
+        if (currentForm) currentForm.submit();
+    });
+});
+</script>
+@endpush
 
 @endsection

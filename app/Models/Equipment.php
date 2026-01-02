@@ -20,5 +20,14 @@ class Equipment extends Model
         'purchase_date' => 'date',
         'warranty'      => 'date',
     ];
+        public function stockMovements()
+    {
+        return $this->hasMany(StockMovement::class);
+    }
+    public function assignments()
+{
+    return $this->hasMany(Assignment::class);
+}
+
 }
 

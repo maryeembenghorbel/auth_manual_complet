@@ -1,0 +1,46 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Assignment;
+use App\Models\Equipment;
+use App\Models\User;
+use Illuminate\Http\Request;
+
+class AssignmentController extends Controller
+{
+    public function index() {
+        $assignments = Assignment::with('equipment','user')->latest()->get();
+        return view('assignments.index', compact('assignments'));
+    }
+
+    public function create() {
+        $equipments = Equipment::all();
+        $users = User::all();
+        return view('assignments.create', compact('equipments','users'));
+    }
+
+    public function store(Request $request) {
+        $request->validate([
+            'equipment_id' => 'required|exists:equipment,id',
+            'user_id' => 'nullable|exists:users,id',
+            'location' => 'nullable|string|max:255',
+        ]);
+
+        Assignment::create([
+            'equipment_id' => $request->equipment_id,
+            'user_id' => $request->user_id,
+            'location' => $request->location,
+            'status' => 'attribué',
+        ]);
+
+        return redirect()->route('assignments.index')->with('success','Affectation enregistrée !');
+    }
+
+    public function return(Assignment $assignment) {
+        $assignment->status = 'retourné';
+        $assignment->save();
+
+        return redirect()->route('assignments.index')->with('success','Équipement retourné !');
+    }
+}

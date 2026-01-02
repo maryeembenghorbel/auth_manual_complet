@@ -143,48 +143,61 @@
     </style>
 </head>
 <body>
-    <!-- Navbar Top -->
-    <nav class="navbar-top">
-        <div class="container-fluid">
-            <div class="d-flex align-items-center justify-content-between w-100">
-                <a href="{{ route('home') }}" class="navbar-brand">
-                    <i class="fas fa-shield-alt"></i>
-                    SIAM
-                </a>
+  <!-- Navbar Top -->
+<nav class="navbar-top">
+    <div class="container-fluid">
+        <div class="d-flex align-items-center justify-content-between w-100">
 
-                <div class="d-flex align-items-center gap-3">
-                    @auth
-                        <div class="dropdown">
-                            <a href="#" class="text-white text-decoration-none d-flex align-items-center gap-2" data-bs-toggle="dropdown">
-                                <img src="https://ui-avatars.com/api/?name={{ auth()->user()->name }}&background=0A1A44&color=fff&size=40" class="rounded-circle" alt="Avatar">
-                                <span class="fw-semibold">{{ auth()->user()->name }}</span>
-                                <i class="fas fa-chevron-down"></i>
-                            </a>
-                            <ul class="dropdown-menu dropdown-menu-end">
-                                <li><a class="dropdown-item" href="{{ route('home') }}"><i class="fas fa-home me-2"></i> Accueil</a></li>
-                                <li><hr class="dropdown-divider"></li>
-                                <li>
-                                    <form method="POST" action="{{ route('logout') }}" class="d-inline">
-                                        @csrf
-                                        <button class="dropdown-item fw-semibold text-danger">
-                                            <i class="fas fa-right-from-bracket me-2"></i> Déconnexion
-                                        </button>
-                                    </form>
-                                </li>
-                            </ul>
-                        </div>
-                    @else
-                        <a href="{{ route('login') }}" class="btn btn-outline-light btn-sm">
-                            <i class="fas fa-sign-in-alt me-1"></i> Connexion
+            {{-- Logo / Titre --}}
+            <a href="{{ route('home') }}" class="navbar-brand">
+                <i class="fas fa-shield-alt"></i>
+                SIAM
+            </a>
+
+            {{-- Zone droite : user / login + burger mobile --}}
+            <div class="d-flex align-items-center gap-3">
+                @auth
+                    <div class="dropdown">
+                        <a href="#"
+                           class="text-white text-decoration-none d-flex align-items-center gap-2"
+                           data-bs-toggle="dropdown">
+                            <span class="avatar-circle d-flex align-items-center justify-content-center">
+                                <i class="fas fa-user-shield"></i>
+                            </span>
+                            <span class="fw-semibold">{{ auth()->user()->name }}</span>
+                            <i class="fas fa-chevron-down"></i>
                         </a>
-                    @endauth
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li>
+                                <a class="dropdown-item" href="{{ route('home') }}">
+                                    <i class="fas fa-home me-2"></i> Accueil
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <form method="POST" action="{{ route('logout') }}" class="d-inline">
+                                    @csrf
+                                    <button class="dropdown-item fw-semibold text-danger">
+                                        <i class="fas fa-right-from-bracket me-2"></i> Déconnexion
+                                    </button>
+                                </form>
+                            </li>
+                        </ul>
+                    </div>
+                @else
+                    <a href="{{ route('login') }}" class="btn btn-outline-light btn-sm">
+                        <i class="fas fa-sign-in-alt me-1"></i> Connexion
+                    </a>
+                @endauth
 
-                    <button class="mobile-menu-toggle d-md-none text-white" onclick="toggleSidebar()">
-                        <i class="fas fa-bars fs-4"></i>
-                    </button>
-                </div>
+                <button class="mobile-menu-toggle d-md-none text-white" onclick="toggleSidebar()">
+                    <i class="fas fa-bars fs-4"></i>
+                </button>
             </div>
         </div>
+    </div>
+</nav>
+
     </nav>
 <!-- Sidebar (uniquement pour utilisateurs connectés) -->
 @auth
@@ -226,7 +239,14 @@
                 </a>
             </li>
         @endif
-
+        <!-- Gestion des équipements -->
+<li class="nav-item mb-1">
+    <a href="{{ route('admin.equipments.index') }}"
+       class="nav-link d-flex align-items-center {{ request()->routeIs('admin.equipments.*') ? 'active bg-primary text-white rounded' : 'text-dark' }}">
+        <i class="fas fa-desktop me-2"></i>
+        Équipements
+    </a>
+</li>
     </ul>
 </nav>
 

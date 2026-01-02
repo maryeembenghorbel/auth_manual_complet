@@ -78,3 +78,18 @@ Route::middleware(['auth', 'role:Admin'])
         Route::resource('equipments', EquipmentController::class);
     });
 
+use App\Http\Controllers\StockController;
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/stocks', [StockController::class, 'index'])->name('stocks.index');
+    Route::get('/stocks/create', [StockController::class, 'create'])->name('stocks.create');
+    Route::post('/stocks', [StockController::class, 'store'])->name('stocks.store');
+});
+use App\Http\Controllers\AssignmentController;
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/assignments', [AssignmentController::class,'index'])->name('assignments.index');
+    Route::get('/assignments/create', [AssignmentController::class,'create'])->name('assignments.create');
+    Route::post('/assignments', [AssignmentController::class,'store'])->name('assignments.store');
+    Route::patch('/assignments/{assignment}/return', [AssignmentController::class,'return'])->name('assignments.return');
+});
