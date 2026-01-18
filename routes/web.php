@@ -37,9 +37,8 @@ Route::middleware(['auth', 'role:Magasinier'])
     ->group(function () {
 
         // Dashboard magasinier
-        Route::get('/dashboard', function () {
-            return view('stock.dash');
-        })->name('dashboard');
+        Route::get('/dashboard', [\App\Http\Controllers\Stock\DashboardController::class, 'index'])
+            ->name('dashboard');
 
         // Consultation équipements (lecture seule)
         Route::get('/equipments', [StockEquipmentController::class, 'index'])
