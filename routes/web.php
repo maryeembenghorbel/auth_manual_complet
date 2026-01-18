@@ -4,6 +4,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ScanController;
 use App\Http\Controllers\Admin\EquipmentController;
+use App\Http\Controllers\Stock\StockMovementController;
+
 Route::get('/', function () { 
     return view('welcome'); 
 });
@@ -45,9 +47,14 @@ Route::middleware(['auth', 'role:Magasinier'])
             ->name('equipments.index');
 
         // Gestion du stock
-        Route::get('/movements', [StockController::class, 'index'])->name('movements.index');
-        Route::get('/movements/create', [StockController::class, 'create'])->name('movements.create');
-        Route::post('/movements', [StockController::class, 'store'])->name('movements.store');
+              Route::get('/movements', [StockMovementController::class, 'index'])
+            ->name('movements.index');
+
+        Route::get('/movements/create', [StockMovementController::class, 'create'])
+            ->name('movements.create');
+
+        Route::post('/movements', [StockMovementController::class, 'store'])
+            ->name('movements.store');
 
         // Affectations
         Route::get('/assignments', [AssignmentController::class, 'index'])->name('assignments.index');
