@@ -3,10 +3,8 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ScanController;
-use App\Http\Controllers\Admin\EquipmentController;
 use App\Http\Controllers\ViewerController;
-use App\Http\Controllers\Stock\StockMovementController;
-
+use App\Http\Controllers\Admin\EquipmentController;
 Route::get('/', function () { 
     return redirect()->route('login'); 
 });

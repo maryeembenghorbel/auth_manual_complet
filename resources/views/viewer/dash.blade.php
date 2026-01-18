@@ -14,7 +14,7 @@
             <div class="card text-white bg-primary mb-3 shadow-sm h-100">
                 <div class="card-header">Total Équipements</div>
                 <div class="card-body">
-                    <h1 class="card-title">{{ $totalEquipments }}</h1>
+                    <h1 class="card-title">{{ $totalEquipments ?? 0 }}</h1>
                     <p class="card-text">Matériels enregistrés</p>
                 </div>
             </div>
@@ -23,7 +23,7 @@
             <div class="card text-white bg-warning mb-3 shadow-sm h-100">
                 <div class="card-header">En Utilisation</div>
                 <div class="card-body">
-                    <h1 class="card-title">{{ $assignedEquipments }}</h1>
+                    <h1 class="card-title">{{ $assignedEquipments ?? 0 }}</h1>
                     <p class="card-text">Matériels affectés</p>
                 </div>
             </div>
@@ -32,7 +32,7 @@
             <div class="card text-white bg-success mb-3 shadow-sm h-100">
                 <div class="card-header">En Stock</div>
                 <div class="card-body">
-                    <h1 class="card-title">{{ $availableEquipments }}</h1>
+                    <h1 class="card-title">{{ $availableEquipments ?? 0 }}</h1>
                     <p class="card-text">Disponibles immédiatement</p>
                 </div>
             </div>
@@ -58,23 +58,26 @@
                     <tbody>
                         @forelse($equipments as $equipment)
                         <tr>
-                            <td><strong>{{ $equipment->nom }}</strong></td>
+                            <td><strong>{{ $equipment->name }}</strong></td>
                             <td><span class="badge bg-secondary">{{ $equipment->type }}</span></td>
-                            <td>{{ $equipment->numero_serie }}</td>
+                            <td>{{ $equipment->serial_number }}</td>
                             <td>
-                                @if($equipment->etat == 'fonctionnel')
-                                    <span class="badge bg-success">Fonctionnel</span>
-                                @elseif($equipment->etat == 'panne')
-                                    <span class="badge bg-danger">En Panne</span>
+                                @php
+                                    $s = strtolower($equipment->state);
+                                @endphp
+                                @if($s == 'fonctionnel' || $s == 'en service' || $s == 'neuf')
+                                    <span class="badge bg-success">{{ ucfirst($equipment->state) }}</span>
+                                @elseif($s == 'panne' || $s == 'hs')
+                                    <span class="badge bg-danger">{{ ucfirst($equipment->state) }}</span>
                                 @else
-                                    <span class="badge bg-warning text-dark">{{ $equipment->etat }}</span>
+                                    <span class="badge bg-warning text-dark">{{ ucfirst($equipment->state) }}</span>
                                 @endif
                             </td>
                             <td>{{ \Carbon\Carbon::parse($equipment->created_at)->format('d/m/Y') }}</td>
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="5" class="text-center text-muted">Aucun équipement trouvé</td>
+                            <td colspan="5" class="text-center text-muted">Aucun équipement trouvé.</td>
                         </tr>
                         @endforelse
                     </tbody>

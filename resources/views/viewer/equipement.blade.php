@@ -1,14 +1,67 @@
 @extends('layouts.app')
 
-@section('title', 'Liste des équipements - Consultant')
+@section('title', 'Consultation Équipements')
 
 @section('content')
 <div class="container-fluid py-4">
     
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h2 class="fw-bold text-primary">Inventaire complet</h2>
-            <p class="text-muted">Consultation détaillée de l'ensemble du parc informatique</p>
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2 class="fw-bold text-primary">Liste des Équipements</h2>
+            <p class="text-muted">Consultation et recherche dans l'inventaire</p>
+        </div>
+    </div>
+
+    {{-- 1. SECTION FILTRES --}}
+    <div class="card mb-4 border-0 shadow-sm bg-light">
+        <div class="card-body">
+            <form action="{{ url()->current() }}" method="GET" class="row g-3">
+                
+                {{-- Recherche --}}
+                <div class="col-md-4">
+                    <label class="form-label small text-muted fw-bold">Recherche</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-white border-end-0"><i class="fas fa-search"></i></span>
+                        <input type="text" name="search" class="form-control border-start-0" 
+                               placeholder="Nom, Marque, Série..." 
+                               value="{{ request('search') }}">
+                    </div>
+                </div>
+
+                {{-- Type --}}
+                <div class="col-md-3">
+                    <label class="form-label small text-muted fw-bold">Type</label>
+                    <select name="type" class="form-select">
+                        <option value="">Tous les types</option>
+                        @foreach($types as $type)
+                            <option value="{{ $type }}" {{ request('type') == $type ? 'selected' : '' }}>
+                                {{ $type }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label small text-muted fw-bold">État</label>
+                    <select name="state" class="form-select">
+                        <option value="">Tous les états</option>
+                        <option value="Neuf" {{ request('state') == 'Neuf' ? 'selected' : '' }}>Neuf</option>
+                        <option value="En service" {{ request('state') == 'En service' ? 'selected' : '' }}>En service</option>
+                        <option value="En réparation" {{ request('state') == 'En réparation' ? 'selected' : '' }}>En réparation</option>
+                        <option value="HS" {{ request('state') == 'HS' ? 'selected' : '' }}>HS</option>
+                    </select>
+                </div>
+
+                <div class="col-md-2 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary w-100">
+                        Filtrer
+                    </button>
+
+                    <a href="{{ url()->current() }}" class="btn btn-outline-secondary" title="Réinitialiser">
+                            <i class="fas fa-undo"></i>
+                    </a>
+                </div>
+            </form>
         </div>
     </div>
 
@@ -16,115 +69,60 @@
         <div class="card-body p-0">
             <div class="table-responsive">
                 <table class="table table-hover align-middle mb-0">
-                    <thead class="bg-light text-uppercase small text-muted">
+                    <thead class="bg-light text-secondary small text-uppercase">
                         <tr>
-                            <th class="ps-4">Image</th>
-                            <th>Équipement (Marque/Modèle)</th>
-                            <th>Tech (Type/Série)</th>
+                            <th class="ps-4">Équipement</th>
+                            <th>Info Technique</th>
                             <th>État</th>
-                            <th class="text-center">Stock</th>
-                            <th class="text-end">Prix</th>
-                            <th>Fournisseur</th>
-                            <th>Dates (Achat / Garantie)</th>
+                            <th>Date d'ajout</th>
                         </tr>
                     </thead>
                     <tbody>
                         @forelse($equipments as $equipment)
                         <tr>
                             <td class="ps-4">
-                                @if($equipment->image)
-                                    <img src="{{ asset('storage/' . $equipment->image) }}" 
-                                         alt="Img" 
-                                         class="rounded shadow-sm"
-                                         style="width: 50px; height: 50px; object-fit: cover; border: 1px solid #dee2e6;">
-                                @else
-                                    <div class="rounded d-flex align-items-center justify-content-center bg-light text-secondary border" 
-                                         style="width: 50px; height: 50px;">
-                                        <i class="fas fa-camera-slash"></i>
-                                    </div>
-                                @endif
-                            </td>
-
-                            <td>
-                                <div class="fw-bold text-dark">{{ $equipment->name }}</div>
-                                <div class="small text-muted">
-                                    <span class="fw-semibold">{{ $equipment->brand }}</span> 
-                                    @if($equipment->model)
-                                        - {{ $equipment->model }}
+                                <div class="d-flex align-items-center">
+                                    {{-- Image (Optionnel) --}}
+                                    @if($equipment->image)
+                                        <img src="{{ asset('storage/' . $equipment->image) }}" class="rounded me-3" width="40" height="40" style="object-fit:cover;">
+                                    @else
+                                        <div class="rounded me-3 bg-light d-flex align-items-center justify-content-center text-secondary" style="width:40px; height:40px;">
+                                            <i class="fas fa-cube"></i>
+                                        </div>
                                     @endif
+                                    
+                                    <div>
+                                        <div class="fw-bold text-dark">{{ $equipment->name }}</div>
+                                        <div class="small text-muted">{{ $equipment->brand }} {{ $equipment->model }}</div>
+                                    </div>
                                 </div>
                             </td>
 
                             <td>
-                                <span class="badge bg-light text-dark border mb-1">
-                                    {{ $equipment->type }}
-                                </span>
-                                <br>
-                                <small class="font-monospace text-muted">{{ $equipment->serial_number }}</small>
+                                <span class="badge bg-light text-dark border">{{ $equipment->type }}</span>
+                                <div class="small text-muted font-monospace mt-1">{{ $equipment->serial_number }}</div>
                             </td>
 
                             <td>
                                 @php
-                                    $badgeClass = match(strtolower($equipment->state)) {
-                                        'neuf', 'excellent' => 'bg-success',
-                                        'en service', 'fonctionnel' => 'bg-info text-dark',
-                                        'panne', 'hs', 'broken' => 'bg-danger',
-                                        'reparation', 'maintenance' => 'bg-warning text-dark',
-                                        'bientot_hs' => 'bg-warning',
-                                        default => 'bg-secondary',
-                                    };
+                                    $st = strtolower($equipment->state);
+                                    $badge = 'bg-secondary';
+                                    if(in_array($st, ['neuf', 'excellent', 'en service', 'fonctionnel'])) $badge = 'bg-success';
+                                    if(in_array($st, ['panne', 'hs', 'broken'])) $badge = 'bg-danger';
+                                    if(in_array($st, ['reparation', 'maintenance'])) $badge = 'bg-warning text-dark';
                                 @endphp
-                                <span class="badge {{ $badgeClass }}">
-                                    {{ ucfirst($equipment->state) }}
-                                </span>
+                                <span class="badge {{ $badge }}">{{ ucfirst($equipment->state) }}</span>
                             </td>
 
-                            <td class="text-center">
-                                <span class="badge rounded-pill bg-light text-dark border px-3">
-                                    {{ $equipment->quantity }}
-                                </span>
+                            <td class="text-muted small">
+                                {{ $equipment->created_at ? $equipment->created_at->format('d/m/Y') : '-' }}
                             </td>
-
-                            <td class="text-end fw-bold text-secondary">
-                                @if($equipment->price)
-                                    {{ number_format($equipment->price, 2, ',', ' ') }} <small>DT</small>
-                                @else
-                                    -
-                                @endif
-                            </td>
-
-                            <td>
-                                <span class="text-muted small">
-                                    <i class="fas fa-truck me-1"></i> {{ $equipment->supplier ?? 'Inconnu' }}
-                                </span>
-                            </td>
-
-                            <td style="min-width: 140px;">
-                                <div class="small text-muted mb-1">
-                                    <i class="far fa-calendar-alt me-1"></i> Achat: 
-                                    {{ $equipment->purchase_date ? \Carbon\Carbon::parse($equipment->purchase_date)->format('d/m/Y') : '-' }}
-                                </div>
-
-                                @if($equipment->warranty)
-                                    @php
-                                        $warrantyDate = \Carbon\Carbon::parse($equipment->warranty);
-                                        $isExpired = $warrantyDate->isPast();
-                                    @endphp
-                                    <div class="small {{ $isExpired ? 'text-danger fw-bold' : 'text-success' }}">
-                                        <i class="fas {{ $isExpired ? 'fa-exclamation-circle' : 'fa-shield-alt' }} me-1"></i>
-                                        Fin: {{ $warrantyDate->format('d/m/Y') }}
-                                    </div>
-                                @else
-                                    <div class="small text-muted">Pas de garantie</div>
-                                @endif
-                            </td>
-
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="8" class="text-center py-5 text-muted">
-                                <i class="fas fa-box-open fa-3x mb-3 text-secondary"></i><br>
-                                Aucun équipement trouvé dans l'inventaire
+                            <td colspan="4" class="text-center py-5 text-muted">
+                                <i class="fas fa-search fa-2x mb-3 opacity-50"></i><br>
+                                Aucun résultat trouvé.
                             </td>
                         </tr>
                         @endforelse
@@ -135,7 +133,7 @@
         
         <div class="card-footer bg-white py-3">
             <div class="d-flex justify-content-end">
-                {{ $equipments->links() }} 
+                {{ $equipments->appends(request()->query())->links() }}
             </div>
         </div>
     </div>
