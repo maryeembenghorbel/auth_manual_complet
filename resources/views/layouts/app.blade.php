@@ -201,22 +201,40 @@
     </nav>
 <!-- Sidebar (uniquement pour utilisateurs connectés) -->
 @auth
+    @php
+        $roleName = strtolower(auth()->user()->role->name ?? '');
+    @endphp
+    
 <nav id="sidebar" class="bg-light border-end vh-100 position-fixed">
     
 
     <ul class="nav flex-column sidebar-menu px-2">
+        @if ($roleName === 'consultant' || $roleName === 'viewer')
+            <li class="nav-item mb-1">
+                <a href="{{ route('viewer.dashboard') }}" 
+                class="nav-link d-flex align-items-center {{ request()->routeIs('viewer.dashboard') ? 'active bg-primary text-white rounded' : 'text-dark' }}">
+                    <i class="fas fa-home me-2"></i>
+                    Acceuil
+                </a>
+            </li>
 
-        <!-- Accueil -->
+            <li class="nav-item mb-1">
+                <a href="{{ route('viewer.equipement') }}"
+                class="nav-link d-flex align-items-center {{ request()->routeIs('viewer.equipement') ? 'active bg-primary text-white rounded' : 'text-dark' }}">
+                    <i class="fas fa-desktop me-2"></i>
+                    Équipements
+                </a>
+            </li>
+    
+    @else   
         <li class="nav-item mb-1">
             <a href="{{ route('home') }}" class="nav-link d-flex align-items-center {{ request()->routeIs('home') ? 'active bg-primary text-white rounded' : 'text-dark' }}">
                 <i class="fas fa-home me-2"></i>
                 Accueil
             </a>
         </li>
-
-        @php
-            $roleName = auth()->user()->role->name;
-        @endphp
+    @endif
+        
 
         @if($roleName == 'Admin')
             <!-- Dashboard Admin -->
@@ -240,6 +258,7 @@
             </li>
         @endif
         <!-- Gestion des équipements -->
+@if($roleName == 'Admin')
 <li class="nav-item mb-1">
     <a href="{{ route('admin.equipments.index') }}"
        class="nav-link d-flex align-items-center {{ request()->routeIs('admin.equipments.*') ? 'active bg-primary text-white rounded' : 'text-dark' }}">
@@ -247,7 +266,8 @@
         Équipements
     </a>
 </li>
-    </ul>
+@endif
+</ul>
 </nav>
 
      

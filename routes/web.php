@@ -4,13 +4,13 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ScanController;
 use App\Http\Controllers\Admin\EquipmentController;
+use App\Http\Controllers\ViewerController;
 use App\Http\Controllers\Stock\StockMovementController;
 
 Route::get('/', function () { 
-    return view('welcome'); 
+    return redirect()->route('login'); 
 });
 
-// Routes pour invités
 Route::middleware('guest')->group(function () {
     Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
     Route::post('/register', [AuthController::class, 'register']);
@@ -18,7 +18,6 @@ Route::middleware('guest')->group(function () {
     Route::post('/login', [AuthController::class, 'login']);
 });
 
-// Routes pour utilisateurs authentifiés
 Route::middleware('auth')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
     Route::get('/home', [AuthController::class, 'home'])->name('home');
@@ -69,9 +68,11 @@ Route::get('/scan/dashboard', function() {
 })->name('scan.dashboard');
 
 // Viewer / Consultant
-Route::get('/viewer/dashboard', function() {
-    return view('viewer.dash'); // viewer/dash.blade.php
-})->name('viewer.dashboard');
+Route::middleware(['auth'])->prefix('viewer')->name('viewer.')->group(function () {
+    Route::get('/dashboard', [ViewerController::class, 'index'])->name('dashboard');
+    
+    Route::get('/equipements', [ViewerController::class, 'equipements'])->name('equipement');
+});
 
 
 use App\Http\Controllers\Admin\UserController;
