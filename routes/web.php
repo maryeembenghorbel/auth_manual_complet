@@ -31,9 +31,31 @@ Route::get('/admin/dashboard', function() {
 })->name('admin.dashboard');
 
 // Stock (Technicien / Magasinier)
-Route::get('/stock/dashboard', function() {
-    return view('stock.dash'); // stock/dash.blade.php
-})->name('stock.dashboard');
+Route::middleware(['auth', 'role:Magasinier'])
+    ->prefix('stock')
+    ->name('stock.')
+    ->group(function () {
+
+        // Dashboard magasinier
+        Route::get('/dashboard', function () {
+            return view('stock.dash');
+        })->name('dashboard');
+
+        // Consultation équipements (lecture seule)
+        Route::get('/equipments', [StockEquipmentController::class, 'index'])
+            ->name('equipments.index');
+
+        // Gestion du stock
+        Route::get('/movements', [StockController::class, 'index'])->name('movements.index');
+        Route::get('/movements/create', [StockController::class, 'create'])->name('movements.create');
+        Route::post('/movements', [StockController::class, 'store'])->name('movements.store');
+
+        // Affectations
+        Route::get('/assignments', [AssignmentController::class, 'index'])->name('assignments.index');
+        Route::get('/assignments/create', [AssignmentController::class, 'create'])->name('assignments.create');
+        Route::post('/assignments', [AssignmentController::class, 'store'])->name('assignments.store');
+        Route::patch('/assignments/{assignment}/return', [AssignmentController::class, 'return'])->name('assignments.return');
+    });
 
 // Scan (Analyste / Analyste Sécurité)
 Route::get('/scan/dashboard', function() {
