@@ -27,7 +27,7 @@ class StockMovementController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'equipment_id' => 'required|exists:equipments,id',
+            'equipment_id' => 'required|exists:equipment,id',
             'type' => 'required|in:entry,exit',
             'quantity' => 'required|integer|min:1',
         ]);

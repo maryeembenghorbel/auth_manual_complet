@@ -47,9 +47,9 @@ Route::middleware(['auth', 'role:Magasinier'])
             ->name('equipments.index');
 
         // Gestion du stock
-             Route::get('/movements', [StockMovementController::class, 'index']) ->name('movements.index');
-              Route::get('/movements/create', [StockMovementController::class, 'create']) ->name('movements.create'); 
-              Route::post('/movements', [StockMovementController::class, 'store']) ->name('movements.store');
+        Route::get('/movements', [StockMovementController::class, 'index']) ->name('movements.index');
+        Route::get('/movements/create', [StockMovementController::class, 'create']) ->name('movements.create'); 
+        Route::post('/movements', [StockMovementController::class, 'store']) ->name('movements.store');
 
         // Affectations
         Route::get('/assignments', [AssignmentController::class, 'index'])->name('assignments.index');

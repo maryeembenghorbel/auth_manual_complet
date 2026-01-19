@@ -182,6 +182,23 @@
                     </a>
                 </li>
             @endif
+
+
+
+                       {{-- Menu Magasinier (Ajouté de la version collègue) --}}
+            @if ($roleName === 'magasinier')
+                <li class="nav-item mb-1">
+                    <a href="{{ route('stock.dashboard') }}" class="nav-link d-flex align-items-center {{ request()->routeIs('stock.dashboard') ? 'active' : 'text-dark' }}">
+                        <i class="fas fa-warehouse me-2"></i> Dashboard Stock
+                    </a>
+                </li>
+
+                <li class="nav-item mb-1">
+                    <a href="{{ route('stock.movements.index') }}" class="nav-link d-flex align-items-center {{ request()->routeIs('stock.movements.*') ? 'active' : 'text-dark' }}">
+                        <i class="fas fa-exchange-alt me-2"></i> Mouvements
+                    </a>
+                </li>
+            @endif
         </ul>
     </nav>
 @endauth
@@ -214,5 +231,6 @@
     }
 </script>
 @stack('scripts')
+@yield('scripts')
 </body>
 </html>
