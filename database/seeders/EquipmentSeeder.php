@@ -4,19 +4,24 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use App\Models\Equipment;
-use Illuminate\Support\Facades\Schema; 
+use App\Models\StorageLocation; 
+use Illuminate\Support\Facades\Schema;
 
 class EquipmentSeeder extends Seeder
 {
     public function run(): void
     {
         Schema::disableForeignKeyConstraints();
-
         Equipment::truncate();
-
         Schema::enableForeignKeyConstraints();
 
-        Equipment::insert([
+        $locations = StorageLocation::all();
+
+        if ($locations->isEmpty()) {
+            $this->command->warn("Attention : Aucun emplacement trouvé. L'équipement sera créé sans emplacement.");
+        }
+
+        $equipmentList = [
             [
                 'name'          => 'PC Bureau HP',
                 'brand'         => 'HP',
@@ -30,8 +35,6 @@ class EquipmentSeeder extends Seeder
                 'purchase_date' => '2024-01-15',
                 'warranty'      => '2027-01-15',
                 'image'         => 'pchp.jpg',
-                'created_at'    => now(),
-                'updated_at'    => now(),
             ],
             [
                 'name'          => 'Écran Dell 24"',
@@ -46,8 +49,6 @@ class EquipmentSeeder extends Seeder
                 'purchase_date' => '2024-03-10',
                 'warranty'      => '2026-03-10',
                 'image'         => 'dellmonitor.jpg',
-                'created_at'    => now(),
-                'updated_at'    => now(),
             ],
             [
                 'name'          => 'Switch Cisco 24 ports',
@@ -62,8 +63,6 @@ class EquipmentSeeder extends Seeder
                 'purchase_date' => '2023-09-01',
                 'warranty'      => '2026-09-01',
                 'image'         => 'switch2960.jpg',
-                'created_at'    => now(),
-                'updated_at'    => now(),
             ],
             [
                 'name'          => 'Routeur Fortinet',
@@ -78,26 +77,29 @@ class EquipmentSeeder extends Seeder
                 'purchase_date' => '2024-05-20',
                 'warranty'      => '2027-05-20',
                 'image'         => 'fortinetrouter.jpg',
-                'created_at'    => now(),
-                'updated_at'    => now(),
             ],
-
             [
-                'name' => 'Switch Cisco 2960',
-                'brand' => 'Cisco',
-                'model' => '2960',
-                'type' => 'switch',
+                'name'          => 'Switch Cisco 2960 (Vieux)',
+                'brand'         => 'Cisco',
+                'model'         => '2960',
+                'type'          => 'switch',
                 'serial_number' => 'SC12345678',
-                'state' => 'fonctionnel',
-                'supplier' => 'Tech Distributors',
-                'quantity' => 155,
-                'price' => 3000,
+                'state'         => 'fonctionnel',
+                'supplier'      => 'Tech Distributors',
+                'quantity'      => 155,
+                'price'         => 3000,
                 'purchase_date' => '2023-05-10',
-                'warranty' => '2024-05-10',
-                'image' => 'switch2960.jpg',
-                'created_at'    => now(),
-                'updated_at'    => now(),
+                'warranty'      => '2024-05-10',
+                'image'         => 'switch2960.jpg',
             ],
-        ]);
+        ];
+
+        foreach ($equipmentList as $item) {
+                if ($locations->isNotEmpty()) {
+                    $item['storage_location_id'] = $locations->random()->id;
+                }
+
+            Equipment::create($item);
+        }
     }
 }

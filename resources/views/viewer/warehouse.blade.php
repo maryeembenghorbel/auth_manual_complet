@@ -6,16 +6,15 @@
 <style>
     .warehouse-grid-container {
         display: grid;
-        
-        grid-template-rows: repeat({{ $totalRows }}, 50px); 
-        grid-template-columns: repeat({{ $totalCols }}, 50px); 
-        gap: 12px; 
-        justify-content: center; 
+        grid-template-rows: repeat({{ $totalRows }}, 50px); /* 50px height per row */
+        grid-template-columns: repeat({{ $totalCols }}, 50px); /* 50px width per col */
+        gap: 12px; /* Space between slots */
+        justify-content: center; /* Center the whole grid horizontally */
         padding: 30px;
         background-color: #f8f9fa;
         border-radius: 12px;
         border: 1px solid #dee2e6;
-        overflow-x: auto; 
+        overflow-x: auto; /* Ensure scroll on small screens if grid is huge */
     }
 
     .storage-slot {
@@ -43,8 +42,8 @@
     .slot-free i { opacity: 0.5; }
 
     .slot-occupied {
-        background-color: #e9ecef; 
-        border: 2px solid #adb5bd; 
+        background-color: #e9ecef; /* Light grey fill */
+        border: 2px solid #adb5bd; /* Darker grey border */
         color: #6c757d;
     }
 </style>
@@ -72,7 +71,7 @@
                         
                         $tooltipText = $location->name;
                         if($isOccupied) {
-                            $tooltipText .= " : OCP par " . $location->equipment->name;
+                            $tooltipText .= " : OCP par " . optional($location->equipment->first())->name;
                         } else {
                              $tooltipText .= " : Libre";
                         }
@@ -84,7 +83,6 @@
                          data-bs-placement="top" 
                          title="{{ $tooltipText }}">
                         
-                        {{-- Optional Icon --}}
                         <i class="fas {{ $iconClass }}"></i>
                     </div>
                 @endforeach

@@ -10,11 +10,10 @@ class StorageLocation extends Model
 
     public function equipment()
     {
-        return $this->hasOne(Equipment::class);
-    }
+        return $this->hasMany(Equipment::class, 'storage_location_id');    }
 
     public function isOccupied()
     {
-        return $this->equipment !== null;
+        return $this->equipment()->exists();
     }
 }

@@ -15,7 +15,7 @@ class Equipment extends Model
 
     protected $fillable = [
         'name','brand','model','type','serial_number','state',
-        'supplier','quantity','price','purchase_date','warranty','image',
+        'supplier','quantity','price','purchase_date','warranty','image','storage_location_id'
     ];
    
 

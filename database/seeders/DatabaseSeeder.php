@@ -3,6 +3,10 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
+use Database\Seeders\UserSeeder; 
+use Database\Seeders\RoleSeeder;
+use Database\Seeders\StorageSeeder;
+use Database\Seeders\EquipmentSeeder;
 
 class DatabaseSeeder extends Seeder
 {
@@ -10,9 +14,7 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             RoleSeeder::class,       
-            StorageSeeder::class,    
-            
-       
+            StorageSeeder::class,  
             UserSeeder::class,       
             EquipmentSeeder::class,  
         ]);
