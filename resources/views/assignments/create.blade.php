@@ -28,6 +28,11 @@
         <label>Location (optionnel)</label>
         <input type="text" name="location" class="form-control">
     </div>
+    <div class="mb-3">
+    <label>Note / Remarque</label>
+    <textarea name="note" class="form-control" rows="4"
+        placeholder="Remarque, contexte, état de l’équipement..."></textarea>
+</div>
 
     <button class="btn btn-success">Enregistrer</button>
 </form>

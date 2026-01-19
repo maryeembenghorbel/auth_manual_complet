@@ -247,6 +247,23 @@
         Équipements
     </a>
 </li>
+<!-- Gestion du stock -->
+<li class="nav-item mb-1">
+    <a href="{{ route('stocks.index') }}"
+       class="nav-link d-flex align-items-center {{ request()->routeIs('stocks.*') ? 'active bg-primary text-white rounded' : 'text-dark' }}">
+        <i class="fas fa-boxes-stacked me-2"></i>
+        Stock
+    </a>
+</li>
+<!-- Affectations -->
+<li class="nav-item mb-1">
+    <a href="{{ route('assignments.index') }}"
+       class="nav-link d-flex align-items-center {{ request()->routeIs('assignments.*') ? 'active bg-primary text-white rounded' : 'text-dark' }}">
+        <i class="fas fa-user-tag me-2"></i>
+        Affectations
+    </a>
+</li>
+
     </ul>
 </nav>
 

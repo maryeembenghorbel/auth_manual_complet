@@ -22,17 +22,21 @@ class AssignmentController extends Controller
 
     public function store(Request $request) {
         $request->validate([
-            'equipment_id' => 'required|exists:equipment,id',
-            'user_id' => 'nullable|exists:users,id',
-            'location' => 'nullable|string|max:255',
-        ]);
+    'equipment_id' => 'required|exists:equipment,id',
+    'user_id' => 'nullable|exists:users,id',
+    'location' => 'nullable|string|max:255',
+    'note' => 'nullable|string|max:5000',
+]);
+
 
         Assignment::create([
-            'equipment_id' => $request->equipment_id,
-            'user_id' => $request->user_id,
-            'location' => $request->location,
-            'status' => 'attribué',
-        ]);
+    'equipment_id' => $request->equipment_id,
+    'user_id' => $request->user_id,
+    'location' => $request->location,
+    'note' => $request->note,
+    'assigned_at' => now(),
+]);
+
 
         return redirect()->route('assignments.index')->with('success','Affectation enregistrée !');
     }

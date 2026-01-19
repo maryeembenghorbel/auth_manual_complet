@@ -9,16 +9,21 @@ class RoleSeeder extends Seeder
 {
     public function run()
     {
-        // Liste des rôles prédéfinis pour ton application SIAM
+        // Rôles nécessaires à l'application
         $roles = [
             ['name' => 'Admin'],
             ['name' => 'Technicien'],
+            ['name' => 'Magasinier'], // ✅ ajouté
             ['name' => 'Analyste'],
             ['name' => 'Viewer'],
         ];
 
         foreach ($roles as $role) {
-            Role::updateOrCreate(['name' => $role['name']], $role);
+            Role::updateOrCreate(
+                ['name' => $role['name']],
+                $role
+            );
         }
     }
 }
+
