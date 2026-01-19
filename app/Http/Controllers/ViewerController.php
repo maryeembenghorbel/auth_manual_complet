@@ -60,7 +60,7 @@ class ViewerController extends Controller
     $totalCols = $locations->max('grid_column_index') ?? 1;
     $totalSlots = $locations->count();
     $occupiedSlots = $locations->filter(function ($loc) {
-        return $loc->equipment !== null;
+        return $loc->equipment->isNotEmpty();
     })->count();
     $freeSlots = $totalSlots - $occupiedSlots;
 
