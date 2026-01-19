@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Equipment; 
 use App\Models\User;
+use App\Models\StorageLocation;
 use Illuminate\Support\Facades\DB;
 
 class ViewerController extends Controller
@@ -51,4 +52,26 @@ class ViewerController extends Controller
 
         return view('viewer.equipement', compact('equipments', 'types'));
     }
+
+    public function warehouseVisual()
+{
+    $locations = StorageLocation::with('equipment')->get();
+    $totalRows = $locations->max('grid_row_index') ?? 1;
+    $totalCols = $locations->max('grid_column_index') ?? 1;
+    $totalSlots = $locations->count();
+    $occupiedSlots = $locations->filter(function ($loc) {
+        return $loc->equipment !== null;
+    })->count();
+    $freeSlots = $totalSlots - $occupiedSlots;
+
+
+    return view('viewer.warehouse', compact(
+        'locations',
+        'totalRows',
+        'totalCols',
+        'totalSlots',
+        'freeSlots',
+        'occupiedSlots'
+    ));
+}
 }

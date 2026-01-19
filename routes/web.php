@@ -70,6 +70,8 @@ Route::middleware(['auth'])->prefix('viewer')->name('viewer.')->group(function (
     Route::get('/dashboard', [ViewerController::class, 'index'])->name('dashboard');
     
     Route::get('/equipements', [ViewerController::class, 'equipements'])->name('equipement');
+
+    Route::get('/warehouse', [ViewerController::class, 'warehouseVisual'])->name('warehouse');
 });
 
 

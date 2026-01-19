@@ -225,6 +225,14 @@
                     Équipements
                 </a>
             </li>
+
+            <li class="nav-item mb-1">
+                <a href="{{ route('viewer.warehouse') }}" 
+                class="nav-link d-flex align-items-center {{ request()->routeIs('viewer.warehouse') ? 'active bg-primary text-white rounded' : 'text-dark' }}">
+                    <i class="fas fa-map-marked-alt me-2"></i>
+                    Plan entrepôt
+                </a>
+            </li>
     
     @else   
         <li class="nav-item mb-1">
