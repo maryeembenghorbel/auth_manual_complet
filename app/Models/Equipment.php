@@ -11,10 +11,13 @@ class Equipment extends Model
 {
     use HasFactory;
 
+     protected $table = 'equipments';
+
     protected $fillable = [
         'name','brand','model','type','serial_number','state',
         'supplier','quantity','price','purchase_date','warranty','image',
     ];
+   
 
     protected $casts = [
         'purchase_date' => 'date',

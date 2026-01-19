@@ -89,8 +89,8 @@
                                 </label>
                                 <select name="type" id="type" class="form-select form-select-lg" required>
                                     <option value="">Sélectionner...</option>
-                                    <option value="entrée">Entrée <i class="bi bi-arrow-up-circle text-success ms-1"></i></option>
-                                    <option value="sortie">Sortie <i class="bi bi-arrow-down-circle text-danger ms-1"></i></option>
+                                    <option value="entry">Entrée <i class="bi bi-arrow-up-circle text-success ms-1"></i></option>
+                                    <option value="exit">Sortie <i class="bi bi-arrow-down-circle text-danger ms-1"></i></option>
                                 </select>
                                 <div class="invalid-feedback">
                                     Type obligatoire

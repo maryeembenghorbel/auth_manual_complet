@@ -21,8 +21,8 @@
         <div class="mb-3">
             <label>Type</label>
             <select name="type" class="form-control" required>
-                <option value="in">Entrée</option>
-                <option value="out">Sortie</option>
+                <option value="entry">Entrée</option>
+                <option value="exit">Sortie</option>
             </select>
         </div>
 

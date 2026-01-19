@@ -28,21 +28,22 @@ class StockController extends Controller
 {
     $request->validate([
         'equipment_id' => 'required|exists:equipment,id',
-        'type' => 'required|in:entrée,sortie',
+        'type' => 'required|in:entry,exit',
         'quantity' => 'required|integer|min:1',
-    ]);
+    ]
+    );
 
     $equipment = Equipment::findOrFail($request->equipment_id);
 
     // Vérification si c'est une sortie et que la quantité est suffisante
-    if ($request->type == 'sortie' && $request->quantity > $equipment->quantity) {
+    if ($request->type == 'exit' && $request->quantity > $equipment->quantity) {
         return redirect()->back()->with('error', 
             "Impossible de retirer {$request->quantity} unités. Stock disponible : {$equipment->quantity}."
         );
     }
 
     // Mettre à jour la quantité
-    if ($request->type == 'entrée') {
+    if ($request->type == 'entry') {
         $equipment->quantity += $request->quantity;
     } else {
         $equipment->quantity -= $request->quantity;

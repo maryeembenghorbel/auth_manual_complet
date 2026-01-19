@@ -28,19 +28,19 @@ class StockMovementController extends Controller
     {
         $request->validate([
             'equipment_id' => 'required|exists:equipments,id',
-            'type' => 'required|in:in,out',
+            'type' => 'required|in:entry,exit',
             'quantity' => 'required|integer|min:1',
         ]);
 
         $equipment = Equipment::findOrFail($request->equipment_id);
 
         // Si sortie, vérifier stock
-        if ($request->type === 'out' && $equipment->quantity < $request->quantity) {
+        if ($request->type === 'exit' && $equipment->quantity < $request->quantity) {
             return back()->withErrors('Stock insuffisant');
         }
 
         // Mise à jour du stock
-        if ($request->type === 'in') {
+        if ($request->type === 'entry') {
             $equipment->quantity += $request->quantity;
         } else {
             $equipment->quantity -= $request->quantity;
