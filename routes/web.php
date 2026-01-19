@@ -5,6 +5,9 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ScanController;
 use App\Http\Controllers\ViewerController;
 use App\Http\Controllers\Admin\EquipmentController;
+use App\Http\Controllers\Stock\StockEquipmentController;
+use App\Http\Controllers\Stock\StockMovementController;
+use App\Http\Controllers\AssignmentController;
 Route::get('/', function () { 
     return redirect()->route('login'); 
 });
@@ -44,14 +47,9 @@ Route::middleware(['auth', 'role:Magasinier'])
             ->name('equipments.index');
 
         // Gestion du stock
-              Route::get('/movements', [StockMovementController::class, 'index'])
-            ->name('movements.index');
-
-        Route::get('/movements/create', [StockMovementController::class, 'create'])
-            ->name('movements.create');
-
-        Route::post('/movements', [StockMovementController::class, 'store'])
-            ->name('movements.store');
+             Route::get('/movements', [StockMovementController::class, 'index']) ->name('movements.index');
+              Route::get('/movements/create', [StockMovementController::class, 'create']) ->name('movements.create'); 
+              Route::post('/movements', [StockMovementController::class, 'store']) ->name('movements.store');
 
         // Affectations
         Route::get('/assignments', [AssignmentController::class, 'index'])->name('assignments.index');
@@ -114,7 +112,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/stocks/create', [StockController::class, 'create'])->name('stocks.create');
     Route::post('/stocks', [StockController::class, 'store'])->name('stocks.store');
 });
-use App\Http\Controllers\AssignmentController;
+
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/assignments', [AssignmentController::class,'index'])->name('assignments.index');
