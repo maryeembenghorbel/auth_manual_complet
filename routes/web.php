@@ -5,8 +5,8 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ScanController;
 use App\Http\Controllers\ViewerController;
 use App\Http\Controllers\Admin\EquipmentController;
-use App\Http\Controllers\Stock\StockEquipmentController;
-use App\Http\Controllers\Stock\StockMovementController;
+use App\Http\Controllers\stock\StockEquipmentController;
+use App\Http\Controllers\stock\StockMovementController;
 use App\Http\Controllers\AssignmentController;
 Route::get('/', function () { 
     return redirect()->route('login'); 
@@ -39,7 +39,7 @@ Route::middleware(['auth', 'role:Magasinier'])
     ->group(function () {
 
         // Dashboard magasinier
-        Route::get('/dashboard', [\App\Http\Controllers\Stock\DashboardController::class, 'index'])
+        Route::get('/dashboard', [\App\Http\Controllers\stock\DashboardController::class, 'index'])
             ->name('dashboard');
 
         // Consultation équipements (lecture seule)
