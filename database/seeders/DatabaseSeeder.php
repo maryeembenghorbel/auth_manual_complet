@@ -42,21 +42,6 @@ class DatabaseSeeder extends Seeder
             'updated_at' => now(),
         ]);
 
-        DB::table('equipment')->insert([
-            [
-                'name' => 'Switch Cisco 2960',
-                'type' => 'switch',
-                'serial_number' => 'SC12345678',
-                'state' => 'fonctionnel',
-                'quantity' => 155,
-                'price' => 3000,
-                'purchase_date' => '2023-05-10',
-                'image' => null,
-                'brand' => 'Cisco',
-                'model' => '2960',
-                'supplier' => 'Tech Distributors',
-                'warranty' => '2024-05-10',
-            ],
-        ]);
+    
     }
 }

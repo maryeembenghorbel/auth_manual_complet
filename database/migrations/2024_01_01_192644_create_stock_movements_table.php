@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
 
             $table->foreignId('equipment_id')
-                  ->constrained('equipments')
+                  ->constrained('equipment')
                   ->cascadeOnDelete();
 
             $table->enum('type', ['entry', 'exit']);
