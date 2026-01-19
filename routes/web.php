@@ -3,12 +3,12 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ScanController;
+use App\Http\Controllers\ViewerController;
 use App\Http\Controllers\Admin\EquipmentController;
 Route::get('/', function () { 
-    return view('welcome'); 
+    return redirect()->route('login'); 
 });
 
-// Routes pour invités
 Route::middleware('guest')->group(function () {
     Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
     Route::post('/register', [AuthController::class, 'register']);
@@ -16,7 +16,6 @@ Route::middleware('guest')->group(function () {
     Route::post('/login', [AuthController::class, 'login']);
 });
 
-// Routes pour utilisateurs authentifiés
 Route::middleware('auth')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
     Route::get('/home', [AuthController::class, 'home'])->name('home');
@@ -45,9 +44,14 @@ Route::middleware(['auth', 'role:Magasinier'])
             ->name('equipments.index');
 
         // Gestion du stock
-        Route::get('/movements', [StockController::class, 'index'])->name('movements.index');
-        Route::get('/movements/create', [StockController::class, 'create'])->name('movements.create');
-        Route::post('/movements', [StockController::class, 'store'])->name('movements.store');
+              Route::get('/movements', [StockMovementController::class, 'index'])
+            ->name('movements.index');
+
+        Route::get('/movements/create', [StockMovementController::class, 'create'])
+            ->name('movements.create');
+
+        Route::post('/movements', [StockMovementController::class, 'store'])
+            ->name('movements.store');
 
         // Affectations
         Route::get('/assignments', [AssignmentController::class, 'index'])->name('assignments.index');
@@ -62,9 +66,13 @@ Route::get('/scan/dashboard', function() {
 })->name('scan.dashboard');
 
 // Viewer / Consultant
-Route::get('/viewer/dashboard', function() {
-    return view('viewer.dash'); // viewer/dash.blade.php
-})->name('viewer.dashboard');
+Route::middleware(['auth'])->prefix('viewer')->name('viewer.')->group(function () {
+    Route::get('/dashboard', [ViewerController::class, 'index'])->name('dashboard');
+    
+    Route::get('/equipements', [ViewerController::class, 'equipements'])->name('equipement');
+
+    Route::get('/warehouse', [ViewerController::class, 'warehouseVisual'])->name('warehouse');
+});
 
 
 use App\Http\Controllers\Admin\UserController;

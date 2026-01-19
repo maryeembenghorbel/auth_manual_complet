@@ -4,17 +4,20 @@ namespace App\Models;
 
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
+//use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory; // <-- corriger l'import
 
 class Equipment extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory;
+
+     protected $table = 'equipments';
 
     protected $fillable = [
         'name','brand','model','type','serial_number','state',
         'supplier','quantity','price','purchase_date','warranty','image',
     ];
+   
 
     protected $casts = [
         'purchase_date' => 'date',
@@ -28,6 +31,11 @@ class Equipment extends Model
 {
     return $this->hasMany(Assignment::class);
 }
+
+    public function storageLocation()
+    {
+        return $this->belongsTo(StorageLocation::class);
+    }
 
 }
 

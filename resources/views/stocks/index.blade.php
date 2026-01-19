@@ -86,7 +86,7 @@
                                         </div>
                                     </td>
                                     <td class="text-center py-4">
-                                        @if($m->type === 'entrée')
+                                        @if($m->type === 'entry')
                                             <span class="badge bg-success-subtle text-success border border-success px-3 py-2 fs-6 fw-semibold">
                                                 <i class="bi bi-arrow-up-circle-fill me-1"></i>
                                                 Entrée +{{ $m->quantity }}
@@ -99,7 +99,7 @@
                                         @endif
                                     </td>
                                     <td class="text-center py-4">
-                                        <div class="display-6 fw-bold {{ $m->type === 'entrée' ? 'text-success' : 'text-danger' }}">
+                                        <div class="display-6 fw-bold {{ $m->type === 'entry' ? 'text-success' : 'text-danger' }}">
                                             {{ $m->quantity }}
                                         </div>
                                         <small class="text-muted">unités</small>

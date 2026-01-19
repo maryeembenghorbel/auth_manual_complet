@@ -76,6 +76,7 @@ private function redirectByRole($user)
         case 'Analyste Sécurité':
             return redirect()->route('scan.dashboard');
         case 'Consultant':
+            return redirect()->route('viewer.dashboard');
         default:
             return redirect()->route('viewer.dashboard');
     }

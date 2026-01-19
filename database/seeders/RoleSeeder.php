@@ -13,7 +13,7 @@ class RoleSeeder extends Seeder
         $roles = [
             ['name' => 'Admin'],
             ['name' => 'Technicien'],
-            ['name' => 'Magasinier'], // ✅ ajouté
+            ['name' => 'Magasinier'], 
             ['name' => 'Analyste'],
             ['name' => 'Viewer'],
         ];
@@ -26,4 +26,3 @@ class RoleSeeder extends Seeder
         }
     }
 }
-
