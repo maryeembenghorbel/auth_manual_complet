@@ -23,42 +23,39 @@ class StockController extends Controller
         return view('stocks.create', compact('equipments'));
     }
 
-    // Stocker le mouvement
+    // Stocker le mouvement ✅ CORRIGÉ
     public function store(Request $request)
-{
-    $request->validate([
-        'equipment_id' => 'required|exists:equipment,id',
-        'type' => 'required|in:entry,exit',
-        'quantity' => 'required|integer|min:1',
-    ]
-    );
+    {
+        $request->validate([
+            'equipment_id' => 'required|exists:equipment,id',
+            'type' => 'required|in:entry,exit',
+            'quantity' => 'required|integer|min:1',
+        ]);
 
-    $equipment = Equipment::findOrFail($request->equipment_id);
+        $equipment = Equipment::findOrFail($request->equipment_id);
 
-    // Vérification si c'est une sortie et que la quantité est suffisante
-    if ($request->type == 'exit' && $request->quantity > $equipment->quantity) {
-        return redirect()->back()->with('error', 
-            "Impossible de retirer {$request->quantity} unités. Stock disponible : {$equipment->quantity}."
-        );
+        // Vérification si c'est une sortie et que la quantité est suffisante
+        if ($request->type == 'exit' && $request->quantity > $equipment->quantity) {
+            return redirect()->back()->with('error', 
+                "Impossible de retirer {$request->quantity} unités. Stock disponible : {$equipment->quantity}."
+            );
+        }
+
+        // Mettre à jour la quantité
+        if ($request->type == 'entry') {
+            $equipment->quantity += $request->quantity;
+        } else {
+            $equipment->quantity -= $request->quantity;
+        }
+        $equipment->save();
+
+        StockMovement::create([
+            'equipment_id' => $equipment->id,
+            'type' => $request->type == 'entry' ? 'entrée' : 'sortie',  // ← ÇA !
+            'quantity' => $request->quantity,
+            'user_id' => Auth::id(),
+        ]);
+
+        return redirect()->route('stocks.index')->with('success', 'Mouvement enregistré !');
     }
-
-    // Mettre à jour la quantité
-    if ($request->type == 'entry') {
-        $equipment->quantity += $request->quantity;
-    } else {
-        $equipment->quantity -= $request->quantity;
-    }
-    $equipment->save();
-
-    // Créer le mouvement
-    StockMovement::create([
-        'equipment_id' => $equipment->id,
-        'type' => $request->type,
-        'quantity' => $request->quantity,
-        'user_id' => Auth::id(),
-    ]);
-
-    return redirect()->route('stocks.index')->with('success', 'Mouvement enregistré !');
-}
-
 }

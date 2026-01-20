@@ -154,34 +154,35 @@
             @endif
 
             {{-- Menu Admin --}}
-            @if($roleName == 'admin')
-                <li class="nav-item mb-1">
-                    <a href="{{ route('admin.dashboard') }}" class="nav-link d-flex align-items-center {{ request()->routeIs('admin.dashboard') ? 'active' : 'text-dark' }}">
-                        <i class="fas fa-tachometer-alt me-2"></i> Dashboard Admin
-                    </a>
-                </li>
-                <li class="nav-item mt-3"><h6 class="text-muted px-2">Gestion</h6></li>
-                <li class="nav-item mb-1">
-                    <a href="{{ route('admin.users.index') }}" class="nav-link d-flex align-items-center {{ request()->routeIs('admin.users.*') ? 'active' : 'text-dark' }}">
-                        <i class="fas fa-users-cog me-2"></i> Utilisateurs
-                    </a>
-                </li>
-                <li class="nav-item mb-1">
-                    <a href="{{ route('admin.equipments.index') }}" class="nav-link d-flex align-items-center {{ request()->routeIs('admin.equipments.*') ? 'active' : 'text-dark' }}">
-                        <i class="fas fa-desktop me-2"></i> Équipements
-                    </a>
-                </li>
-                <li class="nav-item mb-1">
-                    <a href="{{ route('stocks.index') }}" class="nav-link d-flex align-items-center {{ request()->routeIs('stocks.*') ? 'active' : 'text-dark' }}">
-                        <i class="fas fa-boxes-stacked me-2"></i> Stock
-                    </a>
-                </li>
-                <li class="nav-item mb-1">
-                    <a href="{{ route('assignments.index') }}" class="nav-link d-flex align-items-center {{ request()->routeIs('assignments.*') ? 'active' : 'text-dark' }}">
-                        <i class="fas fa-user-tag me-2"></i> Affectations
-                    </a>
-                </li>
-            @endif
+@if($roleName == 'admin')
+    <li class="nav-item mb-1">
+        <a href="{{ route('admin.dashboard') }}" class="nav-link d-flex align-items-center {{ request()->routeIs('admin.dashboard') ? 'active' : 'text-dark' }}">
+            <i class="fas fa-tachometer-alt me-2"></i> Dashboard Admin
+        </a>
+    </li>
+    <li class="nav-item mt-3"><h6 class="text-muted px-2">Gestion</h6></li>
+    <li class="nav-item mb-1">
+        <a href="{{ route('admin.users.index') }}" class="nav-link d-flex align-items-center {{ request()->routeIs('admin.users.*') ? 'active' : 'text-dark' }}">
+            <i class="fas fa-users-cog me-2"></i> Utilisateurs
+        </a>
+    </li>
+    <li class="nav-item mb-1">
+        <a href="{{ route('admin.equipments.index') }}" class="nav-link d-flex align-items-center {{ request()->routeIs('admin.equipments.*') ? 'active' : 'text-dark' }}">
+            <i class="fas fa-desktop me-2"></i> Équipements
+        </a>
+    </li>
+    <li class="nav-item mb-1">
+        <a href="{{ route('stocks.index') }}" class="nav-link d-flex align-items-center {{ request()->routeIs('stocks.*') ? 'active' : 'text-dark' }}">
+            <i class="fas fa-boxes-stacked me-2"></i> Stock
+        </a>
+    </li>
+    {{-- ✅ CORRIGÉ : Route admin.assignments.index --}}
+    <li class="nav-item mb-1">
+        <a href="{{ route('admin.assignments.index') }}" class="nav-link d-flex align-items-center {{ request()->routeIs('admin.assignments.*') ? 'active' : 'text-dark' }}">
+            <i class="fas fa-exchange-alt me-2"></i> Affectations
+        </a>
+    </li>
+@endif
 
 
 

@@ -48,10 +48,10 @@ class StockMovementController extends Controller
 
         $equipment->save();
 
-        // Enregistrer mouvement
+        // ✅ CORRIGÉ ligne 49
         StockMovement::create([
             'equipment_id' => $equipment->id,
-            'type' => $request->type,
+            'type' => $request->type === 'entry' ? 'entrée' : 'sortie',  // ← ÇA !
             'quantity' => $request->quantity,
             'user_id' => auth()->id(),
         ]);

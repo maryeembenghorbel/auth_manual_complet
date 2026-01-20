@@ -3,7 +3,7 @@
 @section('content')
 <h2>Nouvelle Affectation</h2>
 
-<form action="{{ route('assignments.store') }}" method="POST">
+<form action="{{ route('admin.assignments.store') }}" method="POST">
     @csrf
     <div class="mb-3">
         <label>Équipement</label>
