@@ -34,12 +34,10 @@ class StockMovementController extends Controller
 
         $equipment = Equipment::findOrFail($request->equipment_id);
 
-        // Si sortie, vérifier stock
         if ($request->type === 'exit' && $equipment->quantity < $request->quantity) {
             return back()->withErrors('Stock insuffisant');
         }
 
-        // Mise à jour du stock
         if ($request->type === 'entry') {
             $equipment->quantity += $request->quantity;
         } else {
@@ -48,10 +46,9 @@ class StockMovementController extends Controller
 
         $equipment->save();
 
-        // Enregistrer mouvement
         StockMovement::create([
             'equipment_id' => $equipment->id,
-            'type' => $request->type,
+            'type' => $request->type, //=== 'entry' ? 'entrée' : 'sortie', 
             'quantity' => $request->quantity,
             'user_id' => auth()->id(),
         ]);

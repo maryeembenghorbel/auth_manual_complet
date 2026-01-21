@@ -17,10 +17,10 @@
                 <small class="text-muted">Gestion des attributions d'équipements</small>
             </div>
         </div>
+<a href="{{ route('admin.assignments.create') }}" class="btn btn-primary shadow-sm px-4">
+    <i class="fas fa-plus me-2"></i>Nouvelle affectation
+</a>
 
-        <a href="{{ route('assignments.create') }}" class="btn btn-primary shadow-sm px-4">
-            <i class="fas fa-plus me-2"></i>Nouvelle affectation
-        </a>
     </div>
 
     {{-- TABLE --}}
@@ -43,7 +43,7 @@
                     <tr>
                         <th class="ps-4">Équipement</th>
                         <th class="text-center">Employé / Service</th>
-                        <th class="text-center">Location</th>
+                        <th class="text-center">Emplacement</th>
                         <th class="text-center">Statut</th>
                         <th class="text-center">Date</th>
                         <th>Note</th>
@@ -115,14 +115,12 @@
                         {{-- ACTION --}}
                         <td class="text-center pe-3">
                             @if($a->status === 'attribué')
-                                <form method="POST" action="{{ route('assignments.return', $a->id) }}">
-                                    @csrf
-                                    @method('PATCH')
-                                    <button class="btn btn-outline-danger btn-sm"
-                                            onclick="return confirm('Confirmer le retour ?')">
-                                        <i class="fas fa-box-arrow-in-right"></i>
-                                    </button>
-                                </form>
+                                <form method="POST" action="{{ route('admin.assignments.return', $a->id) }}">
+    @csrf
+    @method('PATCH')
+    <button type="submit" class="btn btn-sm btn-outline-success">Retour</button>
+</form>
+
                             @else
                                 <span class="text-success fw-semibold">
                                     <i class="fas fa-check-double"></i>

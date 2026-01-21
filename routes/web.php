@@ -4,10 +4,14 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ScanController;
 use App\Http\Controllers\ViewerController;
+use App\Http\Controllers\AdminController;
 use App\Http\Controllers\Admin\EquipmentController;
 use App\Http\Controllers\stock\StockEquipmentController;
 use App\Http\Controllers\stock\StockMovementController;
 use App\Http\Controllers\AssignmentController;
+use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\StockController; 
+
 Route::get('/', function () { 
     return redirect()->route('login'); 
 });
@@ -25,12 +29,32 @@ Route::middleware('auth')->group(function () {
 });
 
 // Dashboards par rôle
-// routes/web.php
 
-// Admin
-Route::get('/admin/dashboard', function() {
-    return view('admin.dash'); // <--- point vers admin/dash.blade.php
-})->name('admin.dashboard');
+
+// =============================================================================
+// ADMIN - UNIQUEMENT ROLE ADMIN
+// =============================================================================
+Route::middleware(['auth', 'role:Admin'])
+    ->prefix('admin')
+    ->name('admin.')
+    ->group(function () {
+        // Dashboard Admin
+        Route::get('/dashboard', function() {
+            return view('admin.dash');
+        })->name('dashboard');
+        
+        // Users CRUD
+        Route::resource('users', UserController::class);
+        
+        // Equipments CRUD
+        Route::resource('equipments', EquipmentController::class);
+        
+        // Assignments ADMIN
+        Route::get('/assignments', [AssignmentController::class, 'index'])->name('assignments.index');
+        Route::get('/assignments/create', [AssignmentController::class, 'create'])->name('assignments.create');
+        Route::post('/assignments', [AssignmentController::class, 'store'])->name('assignments.store');
+        Route::patch('/assignments/{assignment}/return', [AssignmentController::class, 'return'])->name('assignments.return');
+    });
 
 // Stock (Technicien / Magasinier)
 Route::middleware(['auth', 'role:Magasinier'])
@@ -58,10 +82,16 @@ Route::middleware(['auth', 'role:Magasinier'])
         Route::patch('/assignments/{assignment}/return', [AssignmentController::class, 'return'])->name('assignments.return');
     });
 
-// Scan (Analyste / Analyste Sécurité)
-Route::get('/scan/dashboard', function() {
-    return view('scan.dash'); // scan/dash.blade.php
-})->name('scan.dashboard');
+// =============================================================================
+// SCAN - Analyste
+// =============================================================================
+Route::middleware(['auth'])->group(function() {
+    Route::get('/scan/dashboard', function() {
+        return view('scan.dash');
+    })->name('scan.dashboard');
+    Route::get('/scan', [ScanController::class, 'scanForm'])->name('scan.form');
+    Route::post('/scan', [ScanController::class, 'runScan'])->name('scan.run');
+});
 
 // Viewer / Consultant
 Route::middleware(['auth'])->prefix('viewer')->name('viewer.')->group(function () {
@@ -73,40 +103,6 @@ Route::middleware(['auth'])->prefix('viewer')->name('viewer.')->group(function (
 });
 
 
-use App\Http\Controllers\Admin\UserController;
-
-Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
-    Route::get('dashboard', function () {
-        return view('admin.dash'); // ou utiliser AdminController si tu veux
-    })->name('dashboard');
-
-    Route::resource('users', UserController::class);
-});
-// routes/web.php
-
-
-Route::middleware(['auth', 'role:Admin'])->prefix('admin')->name('admin.')->group(function() {
-
-    Route::get('users', [UserController::class, 'index'])->name('users.index');
-    Route::post('users', [UserController::class, 'store'])->name('users.store');
-    Route::get('users/{user}/edit', [UserController::class, 'edit'])->name('users.edit');
-    Route::put('users/{user}', [UserController::class, 'update'])->name('users.update');
-    Route::delete('users/{user}', [UserController::class, 'destroy'])->name('users.destroy');
-});
-
-Route::get('/scan', [ScanController::class, 'scanForm'])->name('scan.form');
-Route::post('/scan', [ScanController::class, 'runScan'])->name('scan.run');
-
-
-Route::middleware(['auth', 'role:Admin'])
-    ->prefix('admin')
-    ->name('admin.')
-    ->group(function () {
-        Route::resource('equipments', EquipmentController::class);
-    });
-
-use App\Http\Controllers\StockController;
-
 Route::middleware(['auth'])->group(function () {
     Route::get('/stocks', [StockController::class, 'index'])->name('stocks.index');
     Route::get('/stocks/create', [StockController::class, 'create'])->name('stocks.create');
@@ -114,9 +110,4 @@ Route::middleware(['auth'])->group(function () {
 });
 
 
-Route::middleware(['auth'])->group(function () {
-    Route::get('/assignments', [AssignmentController::class,'index'])->name('assignments.index');
-    Route::get('/assignments/create', [AssignmentController::class,'create'])->name('assignments.create');
-    Route::post('/assignments', [AssignmentController::class,'store'])->name('assignments.store');
-    Route::patch('/assignments/{assignment}/return', [AssignmentController::class,'return'])->name('assignments.return');
-});
+
