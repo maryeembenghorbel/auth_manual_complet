@@ -25,7 +25,7 @@
     </div>
 
     <div class="mb-3">
-        <label>Location (optionnel)</label>
+        <label>Emplacement (optionnel)</label>
         <input type="text" name="location" class="form-control">
     </div>
     <div class="mb-3">

@@ -69,11 +69,9 @@ private function redirectByRole($user)
     switch ($roleName) {
         case 'Admin':
             return redirect()->route('admin.dashboard');
-        case 'Technicien':
         case 'Magasinier':
             return redirect()->route('stock.dashboard');
         case 'Analyste':
-        case 'Analyste Sécurité':
             return redirect()->route('scan.dashboard');
         case 'Consultant':
             return redirect()->route('viewer.dashboard');

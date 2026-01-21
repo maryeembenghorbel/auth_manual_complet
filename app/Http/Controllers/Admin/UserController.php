@@ -18,7 +18,7 @@ class UserController extends Controller
                      $q->where('name', '!=', 'Admin');
                  })
                  ->paginate(10); // pagination
-    $roles = \App\Models\Role::where('name', '!=', 'Admin')->get(); // rôles sans Admin
+    $roles = Role::where('name', '!=', 'Admin')->get(); // rôles sans Admin
     return view('admin.users.index', compact('users','roles'));
 }
 
