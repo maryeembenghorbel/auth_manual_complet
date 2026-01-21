@@ -34,7 +34,6 @@
                     @method('PUT')
 
                     <div class="row g-4">
-                        {{-- mêmes champs que create mais avec old() + valeurs du modèle --}}
                         <div class="col-md-6">
                             <label class="form-label fw-semibold">Nom du matériel</label>
                             <input type="text" name="name" class="form-control form-control-lg"
@@ -53,6 +52,12 @@
                                    value="{{ old('model', $equipment->model) }}">
                         </div>
 
+                        <div class="col-md-3">
+                            <label class="form-label fw-semibold">Adresse IP</label>
+                            <input type="text" name="ip_address" class="form-control form-control-lg"
+                                   value="{{ old('ip_address', $equipment->ip_address) }}" placeholder="Ex : 192.168.1.10">
+                        </div>
+                        
                         <div class="col-md-4">
                             <label class="form-label fw-semibold">Type</label>
                             <select name="type" class="form-select form-select-lg" required>

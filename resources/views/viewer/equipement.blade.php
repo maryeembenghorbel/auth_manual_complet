@@ -93,7 +93,11 @@
                                     
                                     <div>
                                         <div class="fw-bold text-dark">{{ $equipment->name }}</div>
-                                        <div class="small text-muted">{{ $equipment->brand }} {{ $equipment->model }}</div>
+                                        <div class="small text-muted">{{ $equipment->brand }} {{ $equipment->model }}
+                                           @if($equipment->ip_address)
+                                               <br><small class="text-muted">IP: <code>{{ $equipment->ip_address }}</code></small>
+                                           @endif
+                                        </div>
                                     </div>
                                 </div>
                             </td>

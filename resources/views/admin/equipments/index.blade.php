@@ -20,7 +20,6 @@
         </a>
     </div>
 
-    {{-- Filtres --}}
     <div class="col-12">
         <div class="content-card mb-2">
             <div class="card-body">
@@ -76,7 +75,7 @@
         <div class="content-card">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <h5 class="mb-0 fw-bold text-white">
-                    <i class="fas fa-list me-2"></i>Liste des équipements
+                    <i class="fas fa-list me-2" style="color: black;"></i>Liste des équipements
                     
                 </h5>
             </div>
@@ -115,6 +114,9 @@
                                                 {{ $equipment->brand }} {{ $equipment->model }}
                                                 @if($equipment->serial_number)
                                                     · SN: {{ $equipment->serial_number }}
+                                                @endif
+                                                @if($equipment->ip_address)
+                                                    <br>· IP: <code>{{ $equipment->ip_address }}</code>
                                                 @endif
                                             </small>
                                         </div>

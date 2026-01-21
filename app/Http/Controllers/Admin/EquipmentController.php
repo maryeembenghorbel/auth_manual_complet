@@ -1,7 +1,7 @@
 <?php
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Controller; // <--- important !
+use App\Http\Controllers\Controller; 
 use Illuminate\Http\Request;
 use App\Models\Equipment;
 use App\Models\Category;
@@ -45,6 +45,7 @@ class EquipmentController extends Controller
             'name'          => 'required|string|max:255',
             'brand'         => 'nullable|string|max:255',
             'model'         => 'nullable|string|max:255',
+            'ip_address'    => 'nullable|ip',
             'type'          => 'required|in:PC,Écran,Routeur,Switch,Imprimante,Autre',
             'serial_number' => 'required|string|max:255|unique:equipment,serial_number',
             'state'         => 'required|in:Neuf,En service,En panne,Maintenance,HS',
@@ -78,6 +79,7 @@ class EquipmentController extends Controller
             'name'          => 'required|string|max:255',
             'brand'         => 'nullable|string|max:255',
             'model'         => 'nullable|string|max:255',
+            'ip_address'    => 'nullable|ip',
             'type'          => 'required|in:PC,Écran,Routeur,Switch,Imprimante,Autre',
             'serial_number' => 'required|string|max:255|unique:equipment,serial_number,' . $equipment->id,
             'state'         => 'required|in:Neuf,En service,En panne,Maintenance,HS',
@@ -102,7 +104,7 @@ class EquipmentController extends Controller
 
     public function destroy(Equipment $equipment)
     {
-        $equipment->delete(); // soft delete
+        $equipment->delete(); 
         return back()->with('success', 'Matériel archivé (soft delete).');
     }
 }

@@ -5,7 +5,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 //use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Eloquent\Factories\HasFactory; // <-- corriger l'import
+use Illuminate\Database\Eloquent\Factories\HasFactory; 
 
 class Equipment extends Model
 {
@@ -15,7 +15,7 @@ class Equipment extends Model
 
     protected $fillable = [
         'name','brand','model','type','serial_number','state',
-        'supplier','quantity','price','purchase_date','warranty','image','storage_location_id'
+        'supplier','quantity','price','purchase_date','warranty','image','storage_location_id','ip_address'
     ];
    
 
@@ -36,6 +36,11 @@ class Equipment extends Model
     {
         return $this->belongsTo(StorageLocation::class);
     }
+
+    public function scans()
+{
+    return $this->hasMany(\App\Models\Scan::class);
+}
 
 }
 

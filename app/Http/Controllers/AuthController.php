@@ -72,7 +72,7 @@ private function redirectByRole($user)
         case 'Magasinier':
             return redirect()->route('stock.dashboard');
         case 'Analyste':
-            return redirect()->route('scan.dashboard');
+            return redirect()->route('analyst.dashboard');
         case 'Consultant':
             return redirect()->route('viewer.dashboard');
         default:

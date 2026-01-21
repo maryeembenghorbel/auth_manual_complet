@@ -85,13 +85,16 @@ Route::middleware(['auth', 'role:Magasinier'])
 // =============================================================================
 // SCAN - Analyste
 // =============================================================================
-Route::middleware(['auth'])->group(function() {
-    Route::get('/scan/dashboard', function() {
-        return view('scan.dash');
-    })->name('scan.dashboard');
-    Route::get('/scan', [ScanController::class, 'scanForm'])->name('scan.form');
-    Route::post('/scan', [ScanController::class, 'runScan'])->name('scan.run');
-});
+Route::middleware(['auth'])
+    ->prefix('analyst')
+    ->name('analyst.')
+    ->group(function () {
+        Route::get('/dashboard', [ScanController::class, 'index'])->name('dashboard');
+            Route::get('/scans', [ScanController::class, 'scansIndex'])->name('scans');
+            Route::get('/reports', [ScanController::class, 'reportsIndex'])->name('reports');
+            Route::post('/equipments/{equipment}/scan', [ScanController::class, 'scanEquipment'])->name('equipments.scan');
+            Route::get('/scan/{scan}/download', [ScanController::class, 'downloadScan'])->name('scan.download');
+    });
 
 // Viewer / Consultant
 Route::middleware(['auth'])->prefix('viewer')->name('viewer.')->group(function () {

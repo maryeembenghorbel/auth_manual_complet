@@ -128,13 +128,9 @@
     
     <nav id="sidebar" class="sidebar border-end">
         <ul class="nav flex-column p-3">
+            
             {{-- Menu pour Viewer / Consultant --}}
-            @if ($roleName === 'consultant' || $roleName === 'viewer')
-                <li class="nav-item mb-1">
-                    <a href="{{ route('viewer.dashboard') }}" class="nav-link d-flex align-items-center {{ request()->routeIs('viewer.dashboard') ? 'active' : 'text-dark' }}">
-                        <i class="fas fa-home me-2"></i> Accueil
-                    </a>
-                </li>
+            @if ($roleName === 'consultant')
                 <li class="nav-item mb-1">
                     <a href="{{ route('viewer.equipement') }}" class="nav-link d-flex align-items-center {{ request()->routeIs('viewer.equipement') ? 'active' : 'text-dark' }}">
                         <i class="fas fa-desktop me-2"></i> Équipements
@@ -143,12 +139,6 @@
                 <li class="nav-item mb-1">
                     <a href="{{ route('viewer.warehouse') }}" class="nav-link d-flex align-items-center {{ request()->routeIs('viewer.warehouse') ? 'active' : 'text-dark' }}">
                         <i class="fas fa-map-marked-alt me-2"></i> Plan entrepôt
-                    </a>
-                </li>
-            @else   
-                <li class="nav-item mb-1">
-                    <a href="{{ route('home') }}" class="nav-link d-flex align-items-center {{ request()->routeIs('home') ? 'active' : 'text-dark' }}">
-                        <i class="fas fa-home me-2"></i> Accueil
                     </a>
                 </li>
             @endif
@@ -190,7 +180,7 @@
 
 
 
-                       {{-- Menu Magasinier (Ajouté de la version collègue) --}}
+            {{-- Menu Magasinier --}}
             @if ($roleName === 'magasinier')
                 <li class="nav-item mb-1">
                     <a href="{{ route('stock.dashboard') }}" class="nav-link d-flex align-items-center {{ request()->routeIs('stock.dashboard') ? 'active' : 'text-dark' }}">
@@ -201,6 +191,27 @@
                 <li class="nav-item mb-1">
                     <a href="{{ route('stock.movements.index') }}" class="nav-link d-flex align-items-center {{ request()->routeIs('stock.movements.*') ? 'active' : 'text-dark' }}">
                         <i class="fas fa-exchange-alt me-2"></i> Mouvements
+                    </a>
+                </li>
+            @endif
+
+            {{-- Menu Analyste --}}
+            @if($roleName==='analyste')
+                <li class="nav-item mb-1">
+                    <a href="{{ route('analyst.dashboard') }}" class="nav-link d-flex align-items-center {{ request()->routeIs('analyst.dashboard') ? 'active' : 'text-dark' }}">
+                        <i class="bi bi-speedometer2"></i>Dashboard
+                    </a>
+                </li>
+
+                <li class="nav-item mb-1">
+                    <a href="{{ route('analyst.scans') }}" class="nav-link d-flex align-items-center {{ request()->routeIs('analyst.scans') ? 'active' : 'text-dark' }}">
+                        <i class="bi bi-search"></i>Scans
+                    </a>
+                </li>
+        
+                <li class="nav-item mb-1">
+                    <a href="{{ route('analyst.reports') }}" class="nav-link d-flex align-items-center {{ request()->routeIs('analyst.reports') ? 'active' : 'text-dark' }}">
+                        <i class="bi bi-file-earmark-text"></i>Rapports
                     </a>
                 </li>
             @endif
