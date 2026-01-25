@@ -40,12 +40,25 @@ class ScanController extends Controller
             $query->whereDate('ended_at', $request->date);
         }
 
+        // Filtre par niveau de risque
+        if ($request->filled('risk_level')) {
+            if ($request->risk_level === 'critical') {
+                $query->whereHas('equipment', function($q) {
+                    $q->where('status', 'needs_review');
+                });
+            } else {
+                $query->whereHas('equipment', function($q) use ($request) {
+                    $q->where('risk_level', $request->risk_level);
+                });
+            }
+        }
+
         $scans = $query->orderBy('ended_at', 'desc')->paginate(20);
 
         return view('analyst.reports', compact('scans'));
     }
 
-    
+    //scan PHP natif par ports (fsockopen)
     public function launch(Equipment $equipment)
     {
         set_time_limit(300); 
@@ -72,6 +85,7 @@ class ScanController extends Controller
         $openPorts = [];
         $closedPorts = [];
 
+        //  Scan PHP natif 
         foreach ($ports as $port) {
             $connection = @fsockopen($equipment->ip_address, $port, $errno, $errstr, 3);
             
@@ -83,7 +97,58 @@ class ScanController extends Controller
             }
         }
 
-        $result = $this->generateReport($equipment, $scan, $openPorts, $closedPorts, $ports);
+        // Exécution Nmap automatique
+        $nmapPath = '"C:\Program Files (x86)\Nmap\nmap.exe"';
+        $command = $nmapPath . 
+            ' -Pn -sV --script vulners --script-args mincvss=4.0 ' . 
+            escapeshellarg($equipment->ip_address);
+        
+        $nmapOutput = shell_exec($command . ' 2>&1');
+
+        //  Nettoyage automatique de la sortie Nmap
+        
+        $cleanedNmapOutput = $this->cleanNmapOutput($nmapOutput ?? '');
+
+        //  Extraction automatique des CVE
+        $cves = $this->extractCves($nmapOutput ?? '');
+
+        // Calcul du risque critique et marquage automatique
+        $criticalCves = array_filter($cves, function($cve) {
+            return $cve['score'] >= 7.0; // CVE critiques (CVSS ≥ 7.0)
+        });
+
+        $criticalScoreCumul = array_sum(array_column($criticalCves, 'score'));
+        $criticalCount = count($criticalCves);
+
+        // Conditions pour marquer "À revoir"
+        $needsReview = ($criticalScoreCumul >= 20) || ($criticalCount >= 3);
+
+        if ($needsReview) {
+            $equipment->update([
+                'status' => 'needs_review',
+                'risk_level' => 'high',
+                'critical_cve_count' => $criticalCount,
+                'critical_score_cumul' => round($criticalScoreCumul, 2),
+                'last_critical_scan_at' => now(),
+            ]);
+
+            Log::warning('⚠️ Équipement marqué CRITIQUE', [
+                'equipment_id' => $equipment->id,
+                'equipment_name' => $equipment->name,
+                'critical_cves' => $criticalCount,
+                'cumul_score' => round($criticalScoreCumul, 2),
+            ]);
+        } else {
+            $equipment->update([
+                'status' => 'reviewed',
+                'risk_level' => count($cves) > 0 ? 'medium' : 'low',
+                'critical_cve_count' => $criticalCount,
+                'critical_score_cumul' => round($criticalScoreCumul, 2),
+            ]);
+        }
+
+        //  Génération du rapport 
+        $result = $this->generateReport($equipment, $scan, $openPorts, $closedPorts, $ports, $cleanedNmapOutput, $cves, $criticalScoreCumul, $needsReview);
 
         $scanDirectory = storage_path('app/scans');
         if (!file_exists($scanDirectory)) {
@@ -109,28 +174,109 @@ class ScanController extends Controller
         Log::info('Scan terminé', [
             'scan_id' => $scan->id,
             'open_ports' => count($openPorts),
+            'vulnerabilities' => count($cves),
+            'needs_review' => $needsReview,
             'file_saved' => $absolutePath,
         ]);
 
-        return back()->with('success', 
-            "✅ Scan terminé : " . count($openPorts) . " port(s) ouvert(s) détecté(s)<br>" .
-            "📁 Rapport sauvegardé : <code>" . basename($filename) . "</code>"
-        );
+        // Message de succès 
+        $successMessage = "✅ Scan terminé : " . count($openPorts) . " port(s) ouvert(s) détecté(s)\n" .
+            "🔴 Vulnérabilités détectées : " . count($cves) . "\n";
+        
+        if ($needsReview) {
+            $successMessage .= "⚠️ ALERTE : Équipement marqué 'À REVOIR'\n" .
+                "Score critique cumulé : " . round($criticalScoreCumul, 2) . " | CVE critiques : {$criticalCount}\n";
+        }
+        
+        $successMessage .= "📁 Rapport sauvegardé : " . basename($filename);
+
+        return back()->with('success', $successMessage);
+    }
+   //Fonction de nettoyage Nmap
+    private function cleanNmapOutput(string $output): string
+    {
+        // Supprimer fingerprint, HTML et messages inutiles
+        $patterns = [
+            '/fingerprint-strings:.*?(?=\n\d+\/tcp|\Z)/si',
+            '/<!DOCTYPE html>.*$/si',
+            '/NEXT SERVICE FINGERPRINT.*$/si',
+            '/=+NEXT SERVICE FINGERPRINT.*?(?=\n=+|\Z)/s',
+            '/Starting Nmap.*\n/',
+            '/Nmap scan report.*\n/',
+            '/Host is up.*\n/',
+            '/Not shown:.*\n/',
+            '/Service detection performed.*\n/',
+            '/Nmap done:.*\n/',
+        ];
+
+        $cleaned = preg_replace($patterns, '', $output);
+        return trim($cleaned);
     }
 
-   
-    private function generateReport($equipment, $scan, $openPorts, $closedPorts, $ports)
+    // Extraction automatique des CVE
+    private function extractCves(string $output): array
     {
+        preg_match_all(
+            '/(CVE-\d{4}-\d+)\s+([\d.]+)/',
+            $output,
+            $matches,
+            PREG_SET_ORDER
+        );
+
+        $cves = [];
+        foreach ($matches as $match) {
+            $cves[] = [
+                'id' => $match[1],
+                'score' => (float) $match[2],
+                'severity' => $this->cvssToSeverity((float) $match[2]),
+            ];
+        }
+
+        // Trier par score décroissant
+        usort($cves, function($a, $b) {
+            return $b['score'] <=> $a['score'];
+        });
+
+        return $cves;
+    }
+
+    // Conversion CVSS → Gravité
+    private function cvssToSeverity(float $score): string
+    {
+        if ($score >= 9.0) return 'CRITIQUE';
+        if ($score >= 7.0) return 'ELEVE';
+        if ($score >= 4.0) return 'MOYEN';
+        return 'FAIBLE';
+    }
+
+    //  Génération du rapport 
+    private function generateReport($equipment, $scan, $openPorts, $closedPorts, $ports, $cleanedNmapOutput, $cves, $criticalScoreCumul, $needsReview)
+    {
+        $riskLevel = $needsReview ? 'CRITIQUE' : (count($cves) > 0 ? 'ELEVE' : (count($openPorts) > 3 ? 'MOYEN' : 'FAIBLE'));
+
         $report = "================================================================\n";
         $report .= "         RAPPORT DE SCAN DE SECURITE - SIAM                     \n";
         $report .= "================================================================\n\n";
         
+        //  EXECUTIVE SUMMARY 
+        $report .= "[EXECUTIVE SUMMARY]\n";
+        $report .= "----------------------------------------------------------------\n";
+        $report .= "Niveau de risque global : {$riskLevel}\n";
+        
+        if ($needsReview) {
+            $report .= "*** EQUIPEMENT MARQUE 'A REVOIR' ***\n";
+            $report .= "Score critique cumule   : " . round($criticalScoreCumul, 2) . "\n";
+        }
+        
+        $report .= "Ports ouverts detectes  : " . count($openPorts) . "\n";
+        $report .= "Vulnerabilites detectees: " . count($cves) . "\n";
+        $report .= "Date du scan            : " . now()->format('d/m/Y à H:i:s') . "\n\n";
+
         $report .= "[INFO] INFORMATIONS GENERALES\n";
         $report .= "----------------------------------------------------------------\n";
         $report .= "Equipement       : " . $equipment->name . "\n";
         $report .= "Type             : " . $equipment->type . "\n";
         $report .= "Adresse IP       : " . $equipment->ip_address . "\n";
-        $report .= "Date du scan     : " . now()->format('d/m/Y à H:i:s') . "\n";
         $report .= "ID du scan       : #" . $scan->id . "\n";
         $report .= "Ports scannes    : " . count($ports) . "\n\n";
         
@@ -150,10 +296,41 @@ class ScanController extends Controller
         $report .= "----------------------------------------------------------------\n";
         $report .= "  " . implode(', ', $closedPorts) . "\n\n";
         
-        $report .= "[ANALYSIS] ANALYSE DE SECURITE\n";
+        // Section Vulnérabilités 
+        $report .= "[VULNERABILITES DETECTEES]\n";
+        $report .= "----------------------------------------------------------------\n";
+
+        if (empty($cves)) {
+            $report .= "  [OK] Aucune vulnerabilite critique detectee.\n";
+        } else {
+            foreach ($cves as $cve) {
+                $severityIcon = $this->getSeverityIcon($cve['severity']);
+                $report .= sprintf(
+                    "  %s %s | Score: %.1f | Gravite: %s\n",
+                    $severityIcon,
+                    $cve['id'],
+                    $cve['score'],
+                    $cve['severity']
+                );
+            }
+        }
+
+        // Sortie Nmap nettoyée (sans bruit)
+        $report .= "\n[NMAP SCAN - SERVICES & DETAILS TECHNIQUES]\n";
+        $report .= "----------------------------------------------------------------\n";
+        if (!empty($cleanedNmapOutput)) {
+            $report .= $cleanedNmapOutput . "\n";
+        } else {
+            $report .= "Aucun resultat Nmap disponible.\n";
+        }
+
+        $report .= "\n[ANALYSIS] ANALYSE DE SECURITE\n";
         $report .= "----------------------------------------------------------------\n";
         
-        if (count($openPorts) === 0) {
+        if (count($cves) > 0) {
+            $report .= "  [!!] ATTENTION : Vulnerabilites critiques detectees\n";
+            $report .= "  [!!] Action requise : Appliquer les correctifs immediatement\n";
+        } elseif (count($openPorts) === 0) {
             $report .= "  [OK] Niveau de securite : BON\n";
             $report .= "  [OK] Aucun port vulnerable expose\n";
         } elseif (count($openPorts) <= 3) {
@@ -163,7 +340,7 @@ class ScanController extends Controller
             $report .= "  [!!] Niveau de securite : ATTENTION\n";
             $report .= "  [!!] " . count($openPorts) . " ports exposes - Audit recommande\n";
         }
-        
+
         $report .= "\n" . str_repeat("=", 64) . "\n";
         $report .= "Rapport genere par SIAM - Systeme d'Information et d'Alerte de Menaces\n";
         $report .= str_repeat("=", 64) . "\n";
@@ -171,7 +348,16 @@ class ScanController extends Controller
         return $report;
     }
 
-    
+    private function getSeverityIcon(string $severity): string
+    {
+        return match($severity) {
+            'CRITIQUE' => '[!!!]',
+            'ELEVE' => '[!!]',
+            'MOYEN' => '[!]',
+            default => '[i]',
+        };
+    }
+
     private function getServiceName($port)
     {
         $services = [
@@ -195,13 +381,11 @@ class ScanController extends Controller
         return $services[$port] ?? 'Service inconnu';
     }
 
-    
     public function scanEquipment(Equipment $equipment)
     {
         return $this->launch($equipment);
     }
 
-    
     public function downloadScan(Scan $scan)
     {
         $absolutePath = storage_path('app/' . $scan->file_path);

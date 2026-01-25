@@ -15,13 +15,19 @@ class Equipment extends Model
 
     protected $fillable = [
         'name','brand','model','type','serial_number','state',
-        'supplier','quantity','price','purchase_date','warranty','image','storage_location_id','ip_address'
+        'supplier','quantity','price','purchase_date','warranty','image','storage_location_id','ip_address','status',
+        'risk_level',
+        'critical_cve_count',
+        'critical_score_cumul',
+        'last_critical_scan_at',
     ];
    
 
     protected $casts = [
         'purchase_date' => 'date',
         'warranty'      => 'date',
+        'last_critical_scan_at' => 'datetime',  
+        'critical_score_cumul' => 'decimal:2',
     ];
         public function stockMovements()
     {

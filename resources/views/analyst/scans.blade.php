@@ -67,9 +67,9 @@
     }
 
     .analyst-content {
-     margin-left: 100px;  /* ⬅️ Réduit de 250px à 220px (30px vers la gauche) */
-        margin-top: 20px;     /* ⬆️ Réduit de 60px à 50px (10px vers le haut) */
-        padding: 20px;        /* Réduit le padding aussi */
+     margin-left: 100px;  
+        margin-top: 20px;     
+        padding: 20px;        
         min-height: calc(100vh - 50px);
     }
 
@@ -117,13 +117,23 @@
         <small class="text-muted">Lancez des scans de vulnérabilités sur vos équipements</small>
     </div>
 
-    {{-- Messages --}}
-    @if(session('success'))
-        <div class="alert alert-success alert-dismissible fade show">
-            {!! session('success') !!}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    {{-- Badge d'alerte critiques --}}
+    @php
+        $criticalCount = \App\Models\Equipment::where('status', 'needs_review')->count();
+    @endphp
+
+    @if($criticalCount > 0)
+        <div class="alert alert-danger d-flex align-items-center mb-4" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-3" style="font-size: 2rem;"></i>
+            <div>
+                <strong>Alerte de sécurité :</strong>
+                {{ $criticalCount }} équipement(s) nécessitent une action immédiate.
+            </div>
         </div>
     @endif
+
+    {{-- Messages --}}
+   
 
     @if(session('error'))
         <div class="alert alert-danger alert-dismissible fade show">
@@ -141,6 +151,73 @@
         </div>
     @endif
 
+    {{-- Cartes statistiques --}}
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body text-center">
+                    <div class="d-flex align-items-center justify-content-center">
+                        <div class="rounded-circle p-2 me-2" style="background: #fee2e2;">
+                            <i class="bi bi-exclamation-triangle text-danger" style="font-size: 1.5rem;"></i>
+                        </div>
+                        <div>
+                            <h4 class="mb-0">{{ \App\Models\Equipment::where('status', 'needs_review')->count() }}</h4>
+                            <small class="text-muted">Critiques</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body text-center">
+                    <div class="d-flex align-items-center justify-content-center">
+                        <div class="rounded-circle p-2 me-2" style="background: #fef3c7;">
+                            <i class="bi bi-exclamation-circle text-warning" style="font-size: 1.5rem;"></i>
+                        </div>
+                        <div>
+                            <h4 class="mb-0">{{ \App\Models\Equipment::where('risk_level', 'medium')->count() }}</h4>
+                            <small class="text-muted">Risque Moyen</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body text-center">
+                    <div class="d-flex align-items-center justify-content-center">
+                        <div class="rounded-circle p-2 me-2" style="background: #d1fae5;">
+                            <i class="bi bi-shield-check text-success" style="font-size: 1.5rem;"></i>
+                        </div>
+                        <div>
+                            <h4 class="mb-0">{{ \App\Models\Equipment::where('risk_level', 'low')->count() }}</h4>
+                            <small class="text-muted">Sécurisés</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body text-center">
+                    <div class="d-flex align-items-center justify-content-center">
+                        <div class="rounded-circle p-2 me-2" style="background: #dbeafe;">
+                            <i class="bi bi-hdd-rack text-primary" style="font-size: 1.5rem;"></i>
+                        </div>
+                        <div>
+                            <h4 class="mb-0">{{ $equipments->count() }}</h4>
+                            <small class="text-muted">Total</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Tableau des équipements -->
     <div class="card shadow-sm border-0">
         <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
@@ -155,17 +232,49 @@
                         <th>Type</th>
                         <th>Adresse IP</th>
                         <th>État</th>
+                        <th>Niveau de Risque</th> 
                         <th>Dernier Scan</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                     @forelse($equipments as $equipment)
-                        <tr>
-                            <td><strong>{{ $equipment->name }}</strong></td>
+                        {{-- Ligne rouge si critique --}}
+                        <tr class="{{ $equipment->status == 'needs_review' ? 'table-danger' : '' }}">
+                            <td>
+                                <strong>{{ $equipment->name }}</strong>
+                                {{--  Badge "À REVOIR" --}}
+                                @if($equipment->status == 'needs_review')
+                                    <br><span class="badge bg-danger mt-1">⚠️ À REVOIR</span>
+                                @endif
+                            </td>
                             <td><span class="badge bg-secondary">{{ $equipment->type }}</span></td>
                             <td><code>{{ $equipment->ip_address }}</code></td>
                             <td><span class="badge bg-success">✓ Actif</span></td>
+                            
+                            {{-- Niveau de Risque avec détails --}}
+                            <td>
+                                @if($equipment->status == 'needs_review')
+                                    <span class="badge bg-danger mb-1">
+                                        <i class="bi bi-exclamation-triangle-fill"></i> CRITIQUE
+                                    </span>
+                                    <br>
+                                    <small class="text-danger">
+                                        <strong>{{ $equipment->critical_cve_count }} CVE</strong> | 
+                                        Score: {{ number_format($equipment->critical_score_cumul, 1) }}
+                                    </small>
+                                @elseif($equipment->risk_level == 'medium')
+                                    <span class="badge bg-warning">🟡 MOYEN</span>
+                                    @if($equipment->critical_cve_count > 0)
+                                        <br><small>{{ $equipment->critical_cve_count }} CVE</small>
+                                    @endif
+                                @elseif($equipment->risk_level == 'low')
+                                    <span class="badge bg-success">🟢 FAIBLE</span>
+                                @else
+                                    <span class="badge bg-secondary">N/A</span>
+                                @endif
+                            </td>
+
                             <td>
                                 @php
                                     $lastScan = $equipment->scans()->latest('ended_at')->first();
@@ -246,16 +355,17 @@
                                     onsubmit="return confirm('⚠️ Lancer un scan sur {{ $equipment->name }} ?');"
                                 >
                                     @csrf
+                                    {{-- Bouton rouge si critique --}}
                                     <button 
                                         type="submit" 
-                                        class="btn btn-danger btn-sm"
+                                        class="btn {{ $equipment->status == 'needs_review' ? 'btn-danger' : 'btn-primary' }} btn-sm"
                                         @if($lastScan && $lastScan->status === 'running') disabled @endif
                                     >
                                         @if($lastScan && $lastScan->status === 'running')
                                             <span class="spinner-border spinner-border-sm me-1"></span>
                                             En cours...
                                         @else
-                                            🔍 Lancer scan
+                                            🔍 {{ $equipment->status == 'needs_review' ? 'Scanner à nouveau' : 'Lancer scan' }}
                                         @endif
                                     </button>
                                 </form>
@@ -263,7 +373,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="text-center text-muted py-5">
+                            <td colspan="7" class="text-center text-muted py-5">
                                 Aucun équipement trouvé
                             </td>
                         </tr>
@@ -281,6 +391,7 @@
                 <ul class="mb-0 small">
                     <li>Cliquez sur <strong>"🔍 Lancer scan"</strong> pour analyser un équipement</li>
                     <li>Le scan détecte les ports ouverts et les services actifs</li>
+                    <li>Les équipements critiques apparaissent en <span class="badge bg-danger">rouge</span></li>
                     <li>Cliquez sur <strong>"👁️ Voir"</strong> pour consulter les résultats</li>
                     <li>Cliquez sur <strong>"💾 Télécharger"</strong> pour sauvegarder le rapport</li>
                 </ul>

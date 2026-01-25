@@ -28,61 +28,92 @@
         </div>
     </div>
 
-    {{-- STATS SÉCURISÉES --}}
-    <div class="row g-4 mb-4">
-        <div class="col-xl-3 col-md-6">
-            <div class="content-card h-100 shadow-sm border-0 overflow-hidden">
-                <div class="card-body text-center py-4 position-relative">
-                    <div class="position-absolute top-0 end-0 p-3">
-                        <i class="fas fa-chart-line text-primary opacity-75"></i>
-                    </div>
-                    <i class="fas fa-desktop fa-3x text-primary mb-3 opacity-75"></i>
-                    <h3 class="mb-1 fw-bold">{{ \App\Models\Equipment::count() ?? 0 }}</h3>
-                    <p class="text-muted mb-2">Total équipements</p>
+  {{-- STATS = --}}
+<div class="row g-4 mb-4">
+    {{--  Équipements Critiques --}}
+    <div class="col-xl-3 col-md-6">
+        <div class="content-card h-100 shadow-sm border-0 overflow-hidden">
+            <div class="card-body text-center py-4 position-relative">
+                <div class="position-absolute top-0 end-0 p-3">
+                    <i class="fas fa-exclamation-triangle text-danger opacity-75"></i>
                 </div>
-            </div>
-        </div>
-
-        <div class="col-xl-3 col-md-6">
-            <div class="content-card h-100 shadow-sm border-0 overflow-hidden">
-                <div class="card-body text-center py-4 position-relative">
-                    <div class="position-absolute top-0 end-0 p-3">
-                        <i class="fas fa-users text-info opacity-75"></i>
-                    </div>
-                    <i class="fas fa-users fa-3x text-info mb-3 opacity-75"></i>
-                    <h3 class="mb-1 fw-bold">{{ \App\Models\User::count() ?? 0 }}</h3>
-                    <p class="text-muted mb-2">Utilisateurs</p>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-xl-3 col-md-6">
-            <div class="content-card h-100 shadow-sm border-0 overflow-hidden">
-                <div class="card-body text-center py-4 position-relative">
-                    <div class="position-absolute top-0 end-0 p-3">
-                        <i class="fas fa-exchange-alt text-success opacity-75"></i>
-                    </div>
-                    <i class="fas fa-exchange-alt fa-3x text-success mb-3 opacity-75"></i>
-                    <h3 class="mb-1 fw-bold">{{ \App\Models\Assignment::count() ?? 0 }}</h3>
-                    <p class="text-muted mb-2">Affectations totales</p>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-xl-3 col-md-6">
-            <div class="content-card h-100 shadow-sm border-0 overflow-hidden bg-gradient-warning text-white">
-                <div class="card-body text-center py-4">
-                    <i class="fas fa-exclamation-triangle fa-3x mb-3 opacity-90"></i>
-                    <h3 class="mb-1 fw-bold">{{ \App\Models\Equipment::where('quantity', '<', 5)->count() ?? 0 }}</h3>
-                    <p class="mb-0 small">Stock critique</p>
-                    @if(\App\Models\Equipment::where('quantity', '<', 5)->count() ?? 0 > 0)
-                        <a href="{{ route('admin.equipments.index') }}?quantity_max=5" class="btn btn-sm btn-light mt-2">Remplir</a>
-                    @endif
-                </div>
+                <i class="fas fa-shield-virus fa-3x text-danger mb-3 opacity-75"></i>
+                <h3 class="mb-1 fw-bold">{{ \App\Models\Equipment::where('status', 'needs_review')->count() }}</h3>
+                <p class="text-muted mb-2">Équipements Critiques</p>
             </div>
         </div>
     </div>
 
+{{--  Équipements Sécurisés --}}
+    <div class="col-xl-3 col-md-6">
+        <div class="content-card h-100 shadow-sm border-0 overflow-hidden">
+            <div class="card-body text-center py-4 position-relative">
+                <div class="position-absolute top-0 end-0 p-3">
+                    <i class="fas fa-check-circle text-success opacity-75"></i>
+                </div>
+                <i class="fas fa-check-circle fa-3x text-success mb-3 opacity-75"></i>
+                <h3 class="mb-1 fw-bold">{{ \App\Models\Equipment::where('risk_level', 'low')->count() }}</h3>
+                <p class="text-muted mb-2">Équipements Sécurisés</p>
+            </div>
+        </div>
+    </div>
+
+    {{--  Total équipements --}}
+    <div class="col-xl-3 col-md-6">
+        <div class="content-card h-100 shadow-sm border-0 overflow-hidden">
+            <div class="card-body text-center py-4 position-relative">
+                <div class="position-absolute top-0 end-0 p-3">
+                    <i class="fas fa-chart-line text-primary opacity-75"></i>
+                </div>
+                <i class="fas fa-desktop fa-3x text-primary mb-3 opacity-75"></i>
+                <h3 class="mb-1 fw-bold">{{ \App\Models\Equipment::count() ?? 0 }}</h3>
+                <p class="text-muted mb-2">Total équipements</p>
+            </div>
+        </div>
+    </div>
+
+    {{-- Utilisateurs --}}
+    <div class="col-xl-3 col-md-6">
+        <div class="content-card h-100 shadow-sm border-0 overflow-hidden">
+            <div class="card-body text-center py-4 position-relative">
+                <div class="position-absolute top-0 end-0 p-3">
+                    <i class="fas fa-users text-info opacity-75"></i>
+                </div>
+                <i class="fas fa-users fa-3x text-info mb-3 opacity-75"></i>
+                <h3 class="mb-1 fw-bold">{{ \App\Models\User::count() ?? 0 }}</h3>
+                <p class="text-muted mb-2">Utilisateurs</p>
+            </div>
+        </div>
+    </div>
+
+    {{--Affectations --}}
+    <div class="col-xl-3 col-md-6">
+        <div class="content-card h-100 shadow-sm border-0 overflow-hidden">
+            <div class="card-body text-center py-4 position-relative">
+                <div class="position-absolute top-0 end-0 p-3">
+                    <i class="fas fa-exchange-alt text-success opacity-75"></i>
+                </div>
+                <i class="fas fa-exchange-alt fa-3x text-success mb-3 opacity-75"></i>
+                <h3 class="mb-1 fw-bold">{{ \App\Models\Assignment::count() ?? 0 }}</h3>
+                <p class="text-muted mb-2">Affectations totales</p>
+            </div>
+        </div>
+    </div>
+
+    {{-- Stock critique --}}
+    <div class="col-xl-3 col-md-6">
+        <div class="content-card h-100 shadow-sm border-0 overflow-hidden bg-gradient-warning text-white">
+            <div class="card-body text-center py-4">
+                <i class="fas fa-exclamation-triangle fa-3x mb-3 opacity-90"></i>
+                <h3 class="mb-1 fw-bold">{{ \App\Models\Equipment::where('quantity', '<', 5)->count() ?? 0 }}</h3>
+                <p class="mb-0 small">Stock critique</p>
+                @if(\App\Models\Equipment::where('quantity', '<', 5)->count() ?? 0 > 0)
+                    <a href="{{ route('admin.equipments.index') }}?quantity_max=5" class="btn btn-sm btn-light mt-2">Remplir</a>
+                @endif
+            </div>
+        </div>
+    </div>
+</div>
     {{-- QUICK ACTIONS --}}
     <div class="row g-4">
         <div class="col-lg-4 col-md-6">

@@ -20,11 +20,79 @@
         </a>
     </div>
 
+    
+    {{-- Cartes statistiques de sécurité --}}
+ 
+    <div class="col-12">
+        <div class="row g-3">
+            <div class="col-md-3">
+                <div class="content-card bg-danger text-white">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-shrink-0">
+                                <i class="fas fa-exclamation-triangle fa-2x opacity-75"></i>
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <h3 class="mb-0">{{ \App\Models\Equipment::where('status', 'needs_review')->count() }}</h3>
+                                <small class="text-white-50">Équipements Critiques</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="content-card bg-warning text-dark">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-shrink-0">
+                                <i class="fas fa-exclamation-circle fa-2x opacity-75"></i>
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <h3 class="mb-0">{{ \App\Models\Equipment::where('risk_level', 'medium')->count() }}</h3>
+                                <small>Risque Moyen</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="content-card bg-success text-white">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-shrink-0">
+                                <i class="fas fa-shield-alt fa-2x opacity-75"></i>
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <h3 class="mb-0">{{ \App\Models\Equipment::where('risk_level', 'low')->count() }}</h3>
+                                <small class="text-white-50">Sécurisés</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="content-card bg-primary text-white">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-shrink-0">
+                                <i class="fas fa-desktop fa-2x opacity-75"></i>
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <h3 class="mb-0">{{ \App\Models\Equipment::count() }}</h3>
+                                <small class="text-white-50">Total Équipements</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="col-12">
         <div class="content-card mb-2">
             <div class="card-body">
                 <form method="GET" class="row g-3 align-items-end">
-                    <div class="col-md-3">
+                    <div class="col-md-2">
                         <label class="form-label fw-semibold">Type</label>
                         <select name="type" class="form-select">
                             <option value="">Tous</option>
@@ -35,7 +103,7 @@
                             @endforeach
                         </select>
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-2">
                         <label class="form-label fw-semibold">État</label>
                         <select name="state" class="form-select">
                             <option value="">Tous</option>
@@ -44,6 +112,22 @@
                                     {{ $state }}
                                 </option>
                             @endforeach
+                        </select>
+                    </div>
+                    {{--  Filtre par niveau de risque --}}
+                    <div class="col-md-2">
+                        <label class="form-label fw-semibold">Risque Sécurité</label>
+                        <select name="risk_level" class="form-select">
+                            <option value="">Tous</option>
+                            <option value="needs_review" {{ request('risk_level') == 'needs_review' ? 'selected' : '' }}>
+                                🔴 Critique
+                            </option>
+                            <option value="medium" {{ request('risk_level') == 'medium' ? 'selected' : '' }}>
+                                🟡 Moyen
+                            </option>
+                            <option value="low" {{ request('risk_level') == 'low' ? 'selected' : '' }}>
+                                🟢 Faible
+                            </option>
                         </select>
                     </div>
                     <div class="col-md-4">
@@ -76,7 +160,6 @@
             <div class="card-header d-flex justify-content-between align-items-center">
                 <h5 class="mb-0 fw-bold text-white">
                     <i class="fas fa-list me-2" style="color: black;"></i>Liste des équipements
-                    
                 </h5>
             </div>
             <div class="card-body p-0">
@@ -87,6 +170,8 @@
                                 <th>Matériel</th>
                                 <th>Type</th>
                                 <th>État</th>
+                                <th>Niveau de Risque</th> 
+                                <th>CVE Critiques</th> 
                                 <th>Stock</th>
                                 <th>Prix</th>
                                 <th>Acheté le</th>
@@ -95,7 +180,8 @@
                         </thead>
                         <tbody>
                             @forelse($equipments as $equipment)
-                            <tr>
+                            {{--  Ligne rouge si critique --}}
+                            <tr class="{{ $equipment->status == 'needs_review' ? 'table-danger' : '' }}">
                                 <td>
                                     <div class="d-flex align-items-center">
                                         @if($equipment->image)
@@ -109,7 +195,13 @@
                                             </div>
                                         @endif
                                         <div>
-                                            <div class="fw-semibold">{{ $equipment->name }}</div>
+                                            <div class="fw-semibold">
+                                                {{ $equipment->name }}
+                                                {{--  Badge "À REVOIR" --}}
+                                                @if($equipment->status == 'needs_review')
+                                                    <span class="badge bg-danger ms-1">À REVOIR</span>
+                                                @endif
+                                            </div>
                                             <small class="text-muted">
                                                 {{ $equipment->brand }} {{ $equipment->model }}
                                                 @if($equipment->serial_number)
@@ -138,6 +230,50 @@
                                         {{ $state }}
                                     </span>
                                 </td>
+
+                                {{--  Niveau de Risque --}}
+                                <td>
+                                    @if($equipment->status == 'needs_review')
+                                        <span class="badge bg-danger px-3 py-2 rounded-pill">
+                                            <i class="fas fa-exclamation-triangle me-1"></i>
+                                            CRITIQUE
+                                        </span>
+                                    @elseif($equipment->risk_level == 'medium')
+                                        <span class="badge bg-warning text-dark px-3 py-2 rounded-pill">
+                                            <i class="fas fa-exclamation-circle me-1"></i>
+                                            MOYEN
+                                        </span>
+                                    @elseif($equipment->risk_level == 'low')
+                                        <span class="badge bg-success px-3 py-2 rounded-pill">
+                                            <i class="fas fa-shield-alt me-1"></i>
+                                            FAIBLE
+                                        </span>
+                                    @else
+                                        <span class="badge bg-secondary px-3 py-2 rounded-pill">
+                                            <i class="fas fa-question-circle me-1"></i>
+                                            NON SCANNÉ
+                                        </span>
+                                    @endif
+                                </td>
+
+                                {{--  CVE Critiques --}}
+                              
+                                <td class="text-center">
+                                    @if($equipment->critical_cve_count > 0)
+                                        <div>
+                                            <span class="badge bg-dark px-3 py-1 rounded-pill fs-6">
+                                                {{ $equipment->critical_cve_count }} CVE
+                                            </span>
+                                            <br>
+                                            <small class="text-muted">
+                                                Score: {{ number_format($equipment->critical_score_cumul, 1) }}
+                                            </small>
+                                        </div>
+                                    @else
+                                        <span class="text-muted">—</span>
+                                    @endif
+                                </td>
+
                                 <td>
                                     @if($equipment->quantity <= 0)
                                         <span class="badge bg-danger">Rupture</span>
@@ -178,7 +314,8 @@
                             </tr>
                             @empty
                             <tr>
-                                <td colspan="7" class="text-center py-5 text-muted">
+                                
+                                <td colspan="9" class="text-center py-5 text-muted">
                                     Aucun équipement trouvé. Ajoutez votre premier matériel.
                                 </td>
                             </tr>

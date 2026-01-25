@@ -253,6 +253,176 @@
             </div>
         </div>
     </div>
+@php
+    $criticalEquipments = \App\Models\Equipment::where('status', 'needs_review')
+        ->orderBy('critical_score_cumul', 'desc')
+        ->get();
+    $criticalCount = $criticalEquipments->count();
+@endphp
+
+@if($criticalCount > 0)
+    <div class="card border-danger shadow-sm mb-4">
+        <div class="card-header bg-danger text-white">
+            <div class="d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">
+                    <i class="bi bi-exclamation-triangle-fill"></i>
+                    ⚠️ ALERTES CRITIQUES - Équipements À Revoir
+                </h5>
+                <span class="badge bg-white text-danger fs-5">{{ $criticalCount }}</span>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="alert alert-warning mb-3">
+                <strong>⚠️ Action requise :</strong> {{ $criticalCount }} équipement(s) nécessitent une intervention immédiate suite à la détection de vulnérabilités critiques.
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-hover table-sm mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Équipement</th>
+                            <th>IP</th>
+                            <th>CVE Critiques</th>
+                            <th>Score Cumulé</th>
+                            <th>Dernier Scan</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($criticalEquipments->take(5) as $equipment)
+                            <tr>
+                                <td>
+                                    <strong>{{ $equipment->name }}</strong>
+                                    <br>
+                                    <small class="text-muted">{{ $equipment->type }}</small>
+                                </td>
+                                <td><code>{{ $equipment->ip_address }}</code></td>
+                                <td class="text-center">
+                                    <span class="badge bg-danger fs-6">
+                                        {{ $equipment->critical_cve_count }}
+                                    </span>
+                                </td>
+                                <td class="text-center">
+                                    <span class="badge bg-dark fs-6">
+                                        {{ number_format($equipment->critical_score_cumul, 2) }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <small>
+                                        {{ $equipment->last_critical_scan_at ? $equipment->last_critical_scan_at->diffForHumans() : 'N/A' }}
+                                    </small>
+                                </td>
+                                <td>
+                                    <div class="btn-group btn-group-sm">
+                                        <a href="{{ route('analyst.equipments.scan', $equipment) }}" 
+                                           class="btn btn-danger btn-sm"
+                                           title="Scanner à nouveau">
+                                            <i class="bi bi-arrow-clockwise"></i>
+                                        </a>
+                                        @php
+                                            $lastScan = $equipment->scans()->latest()->first();
+                                        @endphp
+                                        @if($lastScan && $lastScan->file_path)
+                                            <a href="{{ route('analyst.scan.download', $lastScan) }}" 
+                                               class="btn btn-outline-success btn-sm"
+                                               title="Télécharger">
+                                                <i class="bi bi-download"></i>
+                                            </a>
+                                        @endif
+                                    </div>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+
+            @if($criticalCount > 5)
+                <div class="text-center mt-3">
+                    <a href="{{ route('analyst.reports') }}" class="btn btn-danger">
+                        Voir tous les équipements critiques ({{ $criticalCount }})
+                        <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
+            @endif
+        </div>
+    </div>
+@endif
+
+{{-- Statistiques en cartes (OPTIONNEL - à ajouter sous les 4 cartes existantes si vous voulez) --}}
+<div class="row g-4 mb-4">
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="flex-shrink-0">
+                        <div class="rounded-circle p-3" style="background: #fee2e2;">
+                            <i class="bi bi-exclamation-triangle fs-3 text-danger"></i>
+                        </div>
+                    </div>
+                    <div class="flex-grow-1 ms-3">
+                        <h3 class="mb-0">{{ $criticalCount }}</h3>
+                        <small class="text-muted">Critiques</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="flex-shrink-0">
+                        <div class="rounded-circle p-3" style="background: #fef3c7;">
+                            <i class="bi bi-exclamation-circle fs-3 text-warning"></i>
+                        </div>
+                    </div>
+                    <div class="flex-grow-1 ms-3">
+                        <h3 class="mb-0">{{ \App\Models\Equipment::where('risk_level', 'medium')->count() }}</h3>
+                        <small class="text-muted">Risque Moyen</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="flex-shrink-0">
+                        <div class="rounded-circle p-3" style="background: #d1fae5;">
+                            <i class="bi bi-shield-check fs-3 text-success"></i>
+                        </div>
+                    </div>
+                    <div class="flex-grow-1 ms-3">
+                        <h3 class="mb-0">{{ \App\Models\Equipment::where('risk_level', 'low')->count() }}</h3>
+                        <small class="text-muted">Sécurisés</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="flex-shrink-0">
+                        <div class="rounded-circle p-3" style="background: #dbeafe;">
+                            <i class="bi bi-hdd-rack fs-3 text-primary"></i>
+                        </div>
+                    </div>
+                    <div class="flex-grow-1 ms-3">
+                        <h3 class="mb-0">{{ \App\Models\Equipment::count() }}</h3>
+                        <small class="text-muted">Total</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
     <div class="card border-0 shadow-sm mb-4">
         <div class="card-header bg-white border-0 py-3">
